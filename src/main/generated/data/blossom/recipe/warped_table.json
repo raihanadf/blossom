@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "P": "minecraft:warped_planks",
+    "S": "minecraft:stick"
+  },
+  "pattern": [
+    "PPP",
+    "S S"
+  ],
+  "result": {
+    "id": "blossom:warped_table"
+  }
+}

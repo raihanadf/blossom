@@ -1,0 +1,39 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.motor.drive": {
+			"loop": true,
+			"animation_length": 0.5,
+			"bones": {
+				"rear_wheel": {
+					"rotation": {
+						"0.0": [
+							0,
+							0,
+							0
+						],
+						"0.5": [
+							-360,
+							0,
+							0
+						]
+					}
+				},
+				"front_wheel": {
+					"rotation": {
+						"0.0": [
+							0,
+							0,
+							0
+						],
+						"0.5": [
+							-360,
+							0,
+							0
+						]
+					}
+				}
+			}
+		}
+	}
+}

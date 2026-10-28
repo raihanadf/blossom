@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:wheat",
+    "minecraft:sugar",
+    "minecraft:bone_meal"
+  ],
+  "result": {
+    "count": 4,
+    "id": "blossom:pet_treat"
+  }
+}

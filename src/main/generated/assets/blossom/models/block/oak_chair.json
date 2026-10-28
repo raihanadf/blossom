@@ -1,0 +1,6 @@
+{
+  "parent": "blossom:block/template_chair",
+  "textures": {
+    "planks": "minecraft:block/oak_planks"
+  }
+}

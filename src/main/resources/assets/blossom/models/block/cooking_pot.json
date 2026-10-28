@@ -1,0 +1,60 @@
+{
+	"parent": "minecraft:block/block",
+	"textures": {
+		"particle": "blossom:block/cooking_pot_side",
+		"side": "blossom:block/cooking_pot_side",
+		"inside": "blossom:block/cooking_pot_inside",
+		"handle": "blossom:block/cooking_pot_handle"
+	},
+	"elements": [
+		{
+			"from": [2, 0, 2], "to": [14, 1, 14],
+			"faces": {
+				"up": {"texture": "#inside"},
+				"down": {"texture": "#side", "cullface": "down"},
+				"north": {"texture": "#side"}, "south": {"texture": "#side"},
+				"west": {"texture": "#side"}, "east": {"texture": "#side"}
+			}
+		},
+		{
+			"from": [2, 1, 2], "to": [14, 9, 3],
+			"faces": {
+				"north": {"texture": "#side"}, "south": {"texture": "#inside"},
+				"up": {"texture": "#side"}, "west": {"texture": "#side"}, "east": {"texture": "#side"}
+			}
+		},
+		{
+			"from": [2, 1, 13], "to": [14, 9, 14],
+			"faces": {
+				"south": {"texture": "#side"}, "north": {"texture": "#inside"},
+				"up": {"texture": "#side"}, "west": {"texture": "#side"}, "east": {"texture": "#side"}
+			}
+		},
+		{
+			"from": [2, 1, 3], "to": [3, 9, 13],
+			"faces": {
+				"west": {"texture": "#side"}, "east": {"texture": "#inside"}, "up": {"texture": "#side"}
+			}
+		},
+		{
+			"from": [13, 1, 3], "to": [14, 9, 13],
+			"faces": {
+				"east": {"texture": "#side"}, "west": {"texture": "#inside"}, "up": {"texture": "#side"}
+			}
+		},
+		{
+			"from": [0, 6, 7], "to": [2, 7, 9],
+			"faces": {
+				"up": {"texture": "#handle"}, "down": {"texture": "#handle"}, "north": {"texture": "#handle"},
+				"south": {"texture": "#handle"}, "west": {"texture": "#handle"}
+			}
+		},
+		{
+			"from": [14, 6, 7], "to": [16, 7, 9],
+			"faces": {
+				"up": {"texture": "#handle"}, "down": {"texture": "#handle"}, "north": {"texture": "#handle"},
+				"south": {"texture": "#handle"}, "east": {"texture": "#handle"}
+			}
+		}
+	]
+}

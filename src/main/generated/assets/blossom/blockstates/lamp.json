@@ -1,0 +1,297 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "blossom:block/lamp_base"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_white"
+      },
+      "when": {
+        "color": "white",
+        "glow": "0"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_lit_white"
+      },
+      "when": {
+        "color": "white",
+        "glow": "1|2|3|4"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_orange"
+      },
+      "when": {
+        "color": "orange",
+        "glow": "0"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_lit_orange"
+      },
+      "when": {
+        "color": "orange",
+        "glow": "1|2|3|4"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_magenta"
+      },
+      "when": {
+        "color": "magenta",
+        "glow": "0"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_lit_magenta"
+      },
+      "when": {
+        "color": "magenta",
+        "glow": "1|2|3|4"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_light_blue"
+      },
+      "when": {
+        "color": "light_blue",
+        "glow": "0"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_lit_light_blue"
+      },
+      "when": {
+        "color": "light_blue",
+        "glow": "1|2|3|4"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_yellow"
+      },
+      "when": {
+        "color": "yellow",
+        "glow": "0"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_lit_yellow"
+      },
+      "when": {
+        "color": "yellow",
+        "glow": "1|2|3|4"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_lime"
+      },
+      "when": {
+        "color": "lime",
+        "glow": "0"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_lit_lime"
+      },
+      "when": {
+        "color": "lime",
+        "glow": "1|2|3|4"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_pink"
+      },
+      "when": {
+        "color": "pink",
+        "glow": "0"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_lit_pink"
+      },
+      "when": {
+        "color": "pink",
+        "glow": "1|2|3|4"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_gray"
+      },
+      "when": {
+        "color": "gray",
+        "glow": "0"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_lit_gray"
+      },
+      "when": {
+        "color": "gray",
+        "glow": "1|2|3|4"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_light_gray"
+      },
+      "when": {
+        "color": "light_gray",
+        "glow": "0"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_lit_light_gray"
+      },
+      "when": {
+        "color": "light_gray",
+        "glow": "1|2|3|4"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_cyan"
+      },
+      "when": {
+        "color": "cyan",
+        "glow": "0"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_lit_cyan"
+      },
+      "when": {
+        "color": "cyan",
+        "glow": "1|2|3|4"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_purple"
+      },
+      "when": {
+        "color": "purple",
+        "glow": "0"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_lit_purple"
+      },
+      "when": {
+        "color": "purple",
+        "glow": "1|2|3|4"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_blue"
+      },
+      "when": {
+        "color": "blue",
+        "glow": "0"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_lit_blue"
+      },
+      "when": {
+        "color": "blue",
+        "glow": "1|2|3|4"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_brown"
+      },
+      "when": {
+        "color": "brown",
+        "glow": "0"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_lit_brown"
+      },
+      "when": {
+        "color": "brown",
+        "glow": "1|2|3|4"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_green"
+      },
+      "when": {
+        "color": "green",
+        "glow": "0"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_lit_green"
+      },
+      "when": {
+        "color": "green",
+        "glow": "1|2|3|4"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_red"
+      },
+      "when": {
+        "color": "red",
+        "glow": "0"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_lit_red"
+      },
+      "when": {
+        "color": "red",
+        "glow": "1|2|3|4"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_black"
+      },
+      "when": {
+        "color": "black",
+        "glow": "0"
+      }
+    },
+    {
+      "apply": {
+        "model": "blossom:block/lamp_shade_lit_black"
+      },
+      "when": {
+        "color": "black",
+        "glow": "1|2|3|4"
+      }
+    }
+  ]
+}

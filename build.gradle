@@ -19,10 +19,21 @@ fabricApi {
 	}
 }
 
+repositories {
+	maven {
+		url = "https://api.modrinth.com/maven"
+		content {
+			includeGroup "maven.modrinth"
+		}
+	}
+}
+
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+	// geckolib (mit) animates the critters, version id of geckolib-fabric-26.3 on modrinth
+	implementation "maven.modrinth:geckolib:${project.geckolib_version}"
 }
 
 processResources {

@@ -1,0 +1,19 @@
+{
+	"parent": "minecraft:block/block",
+	"textures": {
+		"particle": "blossom:block/cutting_board_top",
+		"top": "blossom:block/cutting_board_top",
+		"side": "blossom:block/cutting_board_side"
+	},
+	"elements": [
+		{
+			"from": [1, 0, 2], "to": [15, 1, 14],
+			"faces": {
+				"up": {"texture": "#top"},
+				"down": {"texture": "#side", "cullface": "down"},
+				"north": {"texture": "#side"}, "south": {"texture": "#side"},
+				"west": {"texture": "#side"}, "east": {"texture": "#side"}
+			}
+		}
+	]
+}

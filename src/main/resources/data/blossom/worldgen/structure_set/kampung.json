@@ -1,0 +1,14 @@
+{
+	"placement": {
+		"type": "minecraft:random_spread",
+		"salt": 20261029,
+		"separation": 12,
+		"spacing": 30
+	},
+	"structures": [
+		{
+			"structure": "blossom:kampung",
+			"weight": 1
+		}
+	]
+}

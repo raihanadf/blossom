@@ -1,0 +1,6 @@
+{
+	"type": "blossom:kampung",
+	"biomes": "#blossom:has_structure/kampung",
+	"spawn_overrides": {},
+	"step": "surface_structures"
+}

@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "blossom:item/sakura_petal"
+    "layer0": "blossom:item/noodles"
   }
 }

@@ -1,6 +1,10 @@
 package com.raihanadf.blossom;
 
+import com.raihanadf.blossom.pets.PetFeeding;
+import com.raihanadf.blossom.registry.BlossomBlocks;
+import com.raihanadf.blossom.registry.BlossomEntities;
 import com.raihanadf.blossom.registry.BlossomItems;
+import com.raihanadf.blossom.registry.BlossomWorldgen;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
@@ -12,6 +16,10 @@ public class Blossom implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		BlossomBlocks.init();
+		BlossomEntities.init();
+		BlossomWorldgen.init();
+		PetFeeding.init();
 		BlossomItems.init();
 		LOGGER.info("blossom loaded");
 	}

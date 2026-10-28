@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "blossom:block/crimson_chair",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "blossom:block/crimson_chair"
+    },
+    "facing=south": {
+      "model": "blossom:block/crimson_chair",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "blossom:block/crimson_chair",
+      "y": 270
+    }
+  }
+}

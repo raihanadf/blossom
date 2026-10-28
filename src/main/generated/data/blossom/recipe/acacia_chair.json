@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "P": "minecraft:acacia_planks",
+    "S": "minecraft:stick"
+  },
+  "pattern": [
+    "P  ",
+    "PPP",
+    "S S"
+  ],
+  "result": {
+    "id": "blossom:acacia_chair"
+  }
+}

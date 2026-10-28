@@ -1,0 +1,6 @@
+{
+  "parent": "blossom:block/template_lamp_shade",
+  "textures": {
+    "wool": "minecraft:block/black_wool"
+  }
+}

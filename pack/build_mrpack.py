@@ -8,6 +8,7 @@ import zipfile
 from pathlib import Path
 
 FO_VERSION = "15.0.0-beta.2"
+FO_LICENSE_URL = "https://raw.githubusercontent.com/Fabulously-Optimized/fabulously-optimized/main/LICENSE.md"
 
 root = Path(__file__).resolve().parent.parent
 props = dict(
@@ -25,6 +26,7 @@ request = urllib.request.Request(api, headers={"User-Agent": "raihanadf/blossom"
 meta = json.load(urllib.request.urlopen(request))
 fo_url = next(f["url"] for f in meta["files"] if f["primary"])
 fo_bytes = urllib.request.urlopen(urllib.request.Request(fo_url, headers={"User-Agent": "raihanadf/blossom"})).read()
+fo_license = urllib.request.urlopen(FO_LICENSE_URL).read()
 
 out = root / "build" / f"blossom-{version}.mrpack"
 with zipfile.ZipFile(io.BytesIO(fo_bytes)) as base, zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as pack:
@@ -37,8 +39,22 @@ with zipfile.ZipFile(io.BytesIO(fo_bytes)) as base, zipfile.ZipFile(out, "w", zi
             index["name"] = "Blossom"
             index["versionId"] = version
             index["summary"] = f"blossom {version} on fabulously optimized {FO_VERSION}"
+            # our own mod dependencies, downloaded by the launcher from modrinth like fo's mods
+            for version_id in (props["geckolib_version"],):
+                mod = json.load(urllib.request.urlopen(urllib.request.Request(
+                        f"https://api.modrinth.com/v2/version/{version_id}", headers={"User-Agent": "raihanadf/blossom"})))
+                file = next(f for f in mod["files"] if f["primary"])
+                index["files"].append({
+                    "path": f"mods/{file['filename']}",
+                    "hashes": {"sha1": file["hashes"]["sha1"], "sha512": file["hashes"]["sha512"]},
+                    "env": {"client": "required", "server": "required"},
+                    "downloads": [file["url"]],
+                    "fileSize": file["size"],
+                })
             data = json.dumps(index, indent=1).encode()
         pack.writestr(entry.filename, data)
     pack.write(jar, f"overrides/mods/{jar.name}")
+    # fo is bsd-3-clause and we redistribute its config overrides, so its notice has to travel with the pack
+    pack.writestr("licenses/fabulously-optimized.md", fo_license)
 
 print(out)

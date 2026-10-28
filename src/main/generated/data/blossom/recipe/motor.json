@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "B": "minecraft:black_dye",
+    "I": "minecraft:iron_ingot",
+    "R": "minecraft:redstone"
+  },
+  "pattern": [
+    "  I",
+    "IRI",
+    "B B"
+  ],
+  "result": {
+    "id": "blossom:motor"
+  }
+}

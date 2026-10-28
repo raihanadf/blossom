@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "blossom:item/sakura_petal"
+    "model": "blossom:block/crimson_table"
   }
 }

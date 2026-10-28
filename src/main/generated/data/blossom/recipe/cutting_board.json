@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": "#minecraft:planks",
+    "S": "minecraft:stick"
+  },
+  "pattern": [
+    "S##"
+  ],
+  "result": {
+    "id": "blossom:cutting_board"
+  }
+}

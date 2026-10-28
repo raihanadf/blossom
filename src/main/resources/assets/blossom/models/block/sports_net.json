@@ -1,0 +1,20 @@
+{
+	"parent": "minecraft:block/block",
+	"textures": {
+		"particle": "blossom:block/net",
+		"net": "blossom:block/net"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 7.5],
+			"to": [16, 16, 8.5],
+			"faces": {
+				"north": {"texture": "#net"},
+				"south": {"texture": "#net"},
+				"up": {"texture": "#net", "uv": [0, 0, 16, 1]},
+				"east": {"texture": "#net", "uv": [0, 0, 1, 16]},
+				"west": {"texture": "#net", "uv": [0, 0, 1, 16]}
+			}
+		}
+	]
+}

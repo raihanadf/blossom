@@ -1,0 +1,88 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.shuttlecock",
+				"texture_width": 32,
+				"texture_height": 32,
+				"visible_bounds_width": 3,
+				"visible_bounds_height": 2,
+				"visible_bounds_offset": [
+					0,
+					0.75,
+					0
+				]
+			},
+			"bones": [
+				{
+					"name": "root",
+					"pivot": [
+						0,
+						0,
+						0
+					]
+				},
+				{
+					"name": "shuttle",
+					"pivot": [
+						0,
+						2,
+						0
+					],
+					"parent": "root",
+					"cubes": [
+						{
+							"origin": [
+								-1,
+								4,
+								-1
+							],
+							"size": [
+								2,
+								2,
+								2
+							],
+							"uv": [
+								0,
+								0
+							]
+						},
+						{
+							"origin": [
+								-1.5,
+								2,
+								-1.5
+							],
+							"size": [
+								3,
+								2,
+								3
+							],
+							"uv": [
+								8,
+								0
+							]
+						},
+						{
+							"origin": [
+								-2.5,
+								0,
+								-2.5
+							],
+							"size": [
+								5,
+								2,
+								5
+							],
+							"uv": [
+								0,
+								5
+							]
+						}
+					]
+				}
+			]
+		}
+	]
+}

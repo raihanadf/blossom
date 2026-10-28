@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "blossom:block/warped_chair",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "blossom:block/warped_chair"
+    },
+    "facing=south": {
+      "model": "blossom:block/warped_chair",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "blossom:block/warped_chair",
+      "y": 270
+    }
+  }
+}

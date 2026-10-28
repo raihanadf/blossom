@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:feather",
+    "minecraft:feather",
+    "minecraft:feather",
+    "minecraft:string"
+  ],
+  "result": {
+    "count": 2,
+    "id": "blossom:shuttlecock"
+  }
+}

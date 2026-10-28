@@ -1,0 +1,41 @@
+{
+	"parent": "minecraft:block/block",
+	"textures": {
+		"particle": "#wool"
+	},
+	"elements": [
+		{
+			"from": [
+				4,
+				9,
+				4
+			],
+			"to": [
+				12,
+				15,
+				12
+			],
+			"light_emission": 12,
+			"faces": {
+				"north": {
+					"texture": "#wool"
+				},
+				"south": {
+					"texture": "#wool"
+				},
+				"east": {
+					"texture": "#wool"
+				},
+				"west": {
+					"texture": "#wool"
+				},
+				"up": {
+					"texture": "#wool"
+				},
+				"down": {
+					"texture": "#wool"
+				}
+			}
+		}
+	]
+}

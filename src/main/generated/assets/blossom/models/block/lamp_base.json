@@ -1,0 +1,6 @@
+{
+  "parent": "blossom:block/template_lamp_base",
+  "textures": {
+    "planks": "minecraft:block/oak_planks"
+  }
+}
