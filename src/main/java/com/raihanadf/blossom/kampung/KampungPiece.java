@@ -12,6 +12,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntitySpawnReason;
@@ -20,6 +21,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.CrossCollisionBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -134,7 +136,12 @@ public class KampungPiece extends StructurePiece {
 				if (outside > 6) {
 					continue;
 				}
-				int natural = site.level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, cx + x, cz + z) - 1;
+				// the village is built after the trees, so walk down past trunks, leaves and plants to the real ground
+				int canopy = Math.max(site.level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, cx + x, cz + z), ground + 30);
+				int natural = canopy;
+				while (natural > site.level.getMinY() && isCover(site.level.getBlockState(new BlockPos(cx + x, natural, cz + z)))) {
+					natural--;
+				}
 				int top = outside <= 2 ? ground : Math.round(Mth.lerp((outside - 2) / 4f, ground, natural));
 				for (int y = top - 1; y > top - 12; y--) {
 					BlockState below = site.level.getBlockState(new BlockPos(cx + x, y, cz + z));
@@ -145,11 +152,16 @@ public class KampungPiece extends StructurePiece {
 				}
 				site.set(x, top - 1, z, "dirt");
 				site.set(x, top, z, "grass_block");
-				for (int y = top + 1; y <= Math.max(natural, ground) + 22; y++) {
+				for (int y = top + 1; y <= Math.max(Math.max(natural, ground) + 22, canopy); y++) {
 					site.set(x, y, z, "air");
 				}
 			}
 		}
+	}
+
+	private static boolean isCover(BlockState state) {
+		return state.canBeReplaced() || state.is(BlockTags.LOGS) || state.is(BlockTags.LEAVES) || state.is(Blocks.BAMBOO)
+				|| state.is(Blocks.MUSHROOM_STEM) || state.is(Blocks.BROWN_MUSHROOM_BLOCK) || state.is(Blocks.RED_MUSHROOM_BLOCK);
 	}
 
 	private void fenceAndGate(Site site) {
@@ -204,14 +216,23 @@ public class KampungPiece extends StructurePiece {
 				path(site, Math.round(sx - sx * (float) i / steps), Math.round(sz - sz * (float) i / steps));
 			}
 		}
-		// the plaza in the middle with a lantern post
+		// the plaza in the middle with a tall bamboo flagpole flying merah putih, a lantern on top for the night.
+		// it pokes out over the roofs so a kampung is easy to spot from a distance
 		for (int x = -2; x <= 2; x++) {
 			for (int z = -2; z <= 2; z++) {
 				path(site, x, z);
 			}
 		}
-		site.set(0, ground + 1, 0, block(plan.bambooFence ? "bamboo_fence" : "spruce_fence"));
-		site.set(0, ground + 2, 0, "lantern");
+		int top = ground + 14;
+		site.set(0, ground + 1, 0, "stone_brick_wall");
+		for (int y = ground + 2; y < top; y++) {
+			site.set(0, y, 0, "bamboo_fence");
+		}
+		site.set(0, top, 0, "lantern");
+		for (int x = 1; x <= 4; x++) {
+			site.set(x, top - 2, 0, "red_wool");
+			site.set(x, top - 3, 0, "white_wool");
+		}
 	}
 
 	private void path(Site site, int x, int z) {
@@ -456,7 +477,8 @@ public class KampungPiece extends StructurePiece {
 				}
 			}
 		}
-		site.set(b.x(mid, 1), ground + 1, b.z(mid, 1), "campfire");
+		// signal fire: the cooking smoke rises high above the village, you can spot a kampung from far away
+		site.set(b.x(mid, 1), ground + 1, b.z(mid, 1), block("campfire").setValue(BlockStateProperties.SIGNAL_FIRE, true));
 		site.set(b.x(mid, 1), ground + 2, b.z(mid, 1), BlossomBlocks.COOKING_POT.defaultBlockState());
 		site.set(b.x(1, 1), ground + 1, b.z(1, 1), "barrel");
 		site.set(b.x(1, 1), ground + 2, b.z(1, 1), BlossomBlocks.CUTTING_BOARD.defaultBlockState());

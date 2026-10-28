@@ -13,7 +13,6 @@ import com.raihanadf.blossom.sports.Football;
 import com.raihanadf.blossom.sports.Shuttlecock;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.DyeColor;
@@ -38,19 +37,22 @@ public final class RideRenderers {
 				return Blossom.id("textures/entity/motor/motor_" + state.getOrDefaultGeckolibData(COLOR, DyeColor.RED).getSerializedName() + ".png");
 			}
 		};
-		return context -> new GeoEntityRenderer<Motor, LivingEntityRenderState>(context, model) {
+		return context -> new GeoEntityRenderer<Motor, EntityRenderState>(context, model) {
 			{
 				shadowRadius = 0.5f;
 			}
 
 			@Override
-			public void addRenderData(Motor motor, Void related, LivingEntityRenderState state, float partialTick) {
-				state.addGeckolibData(LEAN, motor.getLean(partialTick));
+			public void addRenderData(Motor motor, Void related, EntityRenderState state, float partialTick) {
+				// leaning into turns, plus a little shake when it gets hit (like a boat)
+				float hurt = motor.getHurtTime() - partialTick;
+				float wobble = hurt > 0 ? Mth.sin(hurt) * hurt * Math.min(motor.getDamage(), 10) / 10 * motor.getHurtDir() : 0;
+				state.addGeckolibData(LEAN, motor.getLean(partialTick) + wobble);
 				state.addGeckolibData(COLOR, motor.getColor());
 			}
 
 			@Override
-			public void adjustRenderPose(RenderPassInfo<LivingEntityRenderState> info) {
+			public void adjustRenderPose(RenderPassInfo<EntityRenderState> info) {
 				super.adjustRenderPose(info);
 				info.poseStack().rotateDegrees(Axis.ZP, info.renderState().getOrDefaultGeckolibData(LEAN, 0f));
 			}

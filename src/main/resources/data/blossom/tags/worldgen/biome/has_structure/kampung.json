@@ -4,8 +4,10 @@
 		"minecraft:sunflower_plains",
 		"minecraft:meadow",
 		"minecraft:savanna",
+		"minecraft:savanna_plateau",
 		"minecraft:forest",
 		"minecraft:flower_forest",
+		"minecraft:birch_forest",
 		"minecraft:sparse_jungle",
 		"minecraft:cherry_grove"
 	]

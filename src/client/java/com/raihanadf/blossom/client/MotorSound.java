@@ -36,7 +36,7 @@ public class MotorSound extends AbstractTickableSoundInstance {
 		x = motor.getX();
 		y = motor.getY();
 		z = motor.getZ();
-		float speed = (float) motor.getDeltaMovement().horizontalDistance();
+		float speed = (float) motor.getSpeed();
 		boolean running = motor.isVehicle();
 		volume = running ? 0.25f + Mth.clamp(speed * 1.5f, 0, 0.5f) : 0;
 		pitch = 0.55f + Mth.clamp(speed * 2.2f, 0, 1.1f);

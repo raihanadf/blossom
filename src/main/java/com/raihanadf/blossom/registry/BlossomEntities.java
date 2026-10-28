@@ -44,7 +44,7 @@ public final class BlossomEntities {
 			EntityType.Builder.of(Warga::new, MobCategory.MISC).sized(0.6f, 1.8f).eyeHeight(1.62f).clientTrackingRange(10));
 
 	public static final EntityType<Motor> MOTOR = register("motor",
-			EntityType.Builder.of(Motor::new, MobCategory.MISC).sized(0.9f, 1.0f).clientTrackingRange(10));
+			EntityType.Builder.<Motor>of(Motor::new, MobCategory.MISC).sized(0.9f, 1.0f).clientTrackingRange(10));
 	public static final EntityType<Football> FOOTBALL = register("football",
 			EntityType.Builder.<Football>of(Football::new, MobCategory.MISC).sized(0.5f, 0.5f).clientTrackingRange(8).updateInterval(1));
 	public static final EntityType<Shuttlecock> SHUTTLECOCK = register("shuttlecock",
@@ -55,7 +55,6 @@ public final class BlossomEntities {
 
 	public static void init() {
 		FabricDefaultAttributeRegistry.register(HAMSTER, Hamster.createAttributes());
-		FabricDefaultAttributeRegistry.register(MOTOR, Motor.createAttributes());
 		FabricDefaultAttributeRegistry.register(HEDGEHOG, Hedgehog.createAttributes());
 		FabricDefaultAttributeRegistry.register(CAPYBARA, Capybara.createAttributes());
 

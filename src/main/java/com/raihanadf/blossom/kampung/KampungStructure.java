@@ -31,13 +31,15 @@ public class KampungStructure extends Structure {
 		int highest = Integer.MIN_VALUE;
 		int sum = 0;
 		int samples = 0;
+		int wet = 0;
 		for (int dx = -24; dx <= 24; dx += 12) {
 			for (int dz = -24; dz <= 24; dz += 12) {
 				int surface = generator.getFirstOccupiedHeight(x + dx, z + dz, Heightmap.Types.WORLD_SURFACE_WG, context.heightAccessor(), context.randomState());
 				int floor = generator.getFirstOccupiedHeight(x + dx, z + dz, Heightmap.Types.OCEAN_FLOOR_WG, context.heightAccessor(), context.randomState());
-				// water on top means a lake or the sea
+				// water on top: a pond or a stream gets filled in when the yard is levelled, a lake or the sea does not
 				if (surface != floor) {
-					return Optional.empty();
+					wet++;
+					surface = floor;
 				}
 				lowest = Math.min(lowest, surface);
 				highest = Math.max(highest, surface);
@@ -45,7 +47,7 @@ public class KampungStructure extends Structure {
 				samples++;
 			}
 		}
-		if (highest - lowest > 6) {
+		if (wet > 3 || highest - lowest > 10) {
 			return Optional.empty();
 		}
 		int ground = Math.round(sum / (float) samples);
