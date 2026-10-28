@@ -1,0 +1,29 @@
+{
+	"schemaVersion": 1,
+	"id": "blossom",
+	"version": "${version}",
+	"name": "Blossom",
+	"description": "Cute, cozy and lively things to do together: cooking, critters, motors and sports.",
+	"authors": [
+		"raihanadf"
+	],
+	"contact": {
+		"sources": "https://github.com/raihanadf/blossom"
+	},
+	"icon": "assets/blossom/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.raihanadf.blossom.Blossom"
+		],
+		"fabric-datagen": [
+			"com.raihanadf.blossom.client.datagen.BlossomDataGenerator"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~26.3",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}
