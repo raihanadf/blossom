@@ -9,12 +9,20 @@ import net.minecraft.util.RandomSource;
 // the layout of one kampung, worked out from its seed alone so every chunk of it agrees.
 // coordinates are relative to the village centre, the ground level is shared by everything
 public class KampungPlan {
-	public static final int EXTENT = 32;
 
-	public enum Kind { HOUSE, KITCHEN, FIELD, POST }
+	// homes, the dapur, a sawah plot, the satpam's post, a warung, the musholla, the pos ronda, a well, a chicken coop
+	// and a patio where the harvested rice is spread out to dry
+	public enum Kind { HOUSE, KITCHEN, FIELD, POST, WARUNG, MUSHOLLA, RONDA, SUMUR, KANDANG, JEMURAN }
 
 	// javanese limasan and joglo, a kampung gable house, toraja tongkonan and bugis rumah panggung
-	public enum Style { LIMASAN, JOGLO, KAMPUNG, TONGKONAN, PANGGUNG }
+	public enum Style {
+		LIMASAN, JOGLO, KAMPUNG, TONGKONAN, PANGGUNG;
+
+		// how far the floor sits above the ground: toraja and bugis houses stand on stilts
+		public static int raise(Style style) {
+			return style == TONGKONAN ? 3 : style == PANGGUNG ? 2 : 0;
+		}
+	}
 
 	// a rectangle x0..x1, z0..z1 with its door (or front) facing `front`
 	public record Building(Kind kind, int x0, int z0, int x1, int z1, Direction front, Style style, int palette, int residents) {
@@ -76,29 +84,44 @@ public class KampungPlan {
 	public final int gateZ;
 	public final boolean bambooFence;
 	public final List<Building> buildings = new ArrayList<>();
-	private final boolean[][] taken = new boolean[EXTENT * 2 + 1][EXTENT * 2 + 1];
+	// how far the plan reaches from its middle (the fence's furthest point plus a little)
+	public final int extent;
+	public final int size;
+	private final boolean[][] taken;
 
 	public KampungPlan(long seed) {
+		this(seed, Float.NaN, 7 + RandomSource.create(seed ^ 0x5157EL).nextInt(8));
+	}
+
+	// `gate` points the gate a given way (radians, x = cos, z = sin), NaN leaves it to chance. `size` is about how many
+	// buildings it gets (at least 5): the fence grows to fit them
+	public KampungPlan(long seed, float gate, int size) {
 		this.seed = seed;
+		this.size = size;
 		RandomSource random = RandomSource.create(seed);
-		float base = 20 + random.nextInt(5);
+		float base = 13 + Mth.sqrt(Math.max(5, size)) * 4.4f;
+		float widest = 0;
 		for (int i = 0; i < radii.length; i++) {
-			radii[i] = base * (0.85f + random.nextFloat() * 0.25f);
+			radii[i] = base * (0.88f + random.nextFloat() * 0.22f);
+			widest = Math.max(widest, radii[i]);
 		}
-		gateAngle = random.nextFloat() * Mth.TWO_PI;
+		extent = Mth.ceil(widest) + 2;
+		taken = new boolean[extent * 2 + 1][extent * 2 + 1];
+		float rolled = random.nextFloat() * Mth.TWO_PI;
+		gateAngle = Float.isNaN(gate) ? rolled : gate;
 		float gateRadius = radiusAt(gateAngle) - 0.5f;
 		gateX = Math.round(Mth.cos(gateAngle) * gateRadius);
 		gateZ = Math.round(Mth.sin(gateAngle) * gateRadius);
 		bambooFence = random.nextInt(4) != 0;
 
 		// keep the edges, the gate corridor and the middle plaza free
-		for (int x = -EXTENT; x <= EXTENT; x++) {
-			for (int z = -EXTENT; z <= EXTENT; z++) {
+		for (int x = -extent; x <= extent; x++) {
+			for (int z = -extent; z <= extent; z++) {
 				boolean nearFence = Mth.sqrt(x * x + z * z) > radiusAt((float) Mth.atan2(z, x)) - 2.5f;
 				float along = x * Mth.cos(gateAngle) + z * Mth.sin(gateAngle);
 				float across = Math.abs(-x * Mth.sin(gateAngle) + z * Mth.cos(gateAngle));
 				boolean corridor = across < 2 && along > 0;
-				taken[x + EXTENT][z + EXTENT] = nearFence || corridor || (Math.abs(x) <= 1 && Math.abs(z) <= 1);
+				taken[x + extent][z + extent] = nearFence || corridor || (Math.abs(x) <= 1 && Math.abs(z) <= 1);
 			}
 		}
 
@@ -115,13 +138,25 @@ public class KampungPlan {
 			}
 		}
 
+		// the shared buildings a kampung of this size has; the rest of its buildings are homes
+		List<Kind> shared = new ArrayList<>(List.of(Kind.FIELD, Kind.KITCHEN, Kind.SUMUR, Kind.WARUNG, Kind.KANDANG, Kind.RONDA, Kind.MUSHOLLA, Kind.JEMURAN));
+		int sharedCount = Mth.clamp(size / 2, 2, shared.size());
+		int houses = Math.max(3, size - sharedCount - (buildings.isEmpty() ? 0 : 1));
 		place(random, Kind.FIELD, 8 + random.nextInt(4), 6 + random.nextInt(2), 0, Style.KAMPUNG);
 		place(random, Kind.KITCHEN, 5 + random.nextInt(2), 5, 0, Style.LIMASAN);
-		int houses = 3 + random.nextInt(3);
 		for (int i = 0; i < houses; i++) {
 			Style style = Style.values()[random.nextInt(Style.values().length)];
-			// walls plus a two block porch in front
-			place(random, Kind.HOUSE, 5 + random.nextInt(3), 5 + random.nextInt(3) + 2, 1 + random.nextInt(2), style);
+			// walls plus a two block porch in front, raised houses also need room for the stairs down
+			place(random, Kind.HOUSE, 5 + random.nextInt(3), 5 + random.nextInt(3) + 2 + Style.raise(style), 1 + random.nextInt(2), style);
+		}
+		// the shared buildings go in the room left between the homes, the bigger the kampung the more of them
+		for (Kind kind : shared.subList(2, sharedCount)) {
+			switch (kind) {
+				case MUSHOLLA -> place(random, kind, 7, 7, 0, Style.JOGLO);
+				case WARUNG -> place(random, kind, 5, 4, 1, Style.KAMPUNG);
+				case KANDANG, JEMURAN -> place(random, kind, 5, 4, 0, Style.KAMPUNG);
+				default -> place(random, kind, 3, 3, 0, Style.KAMPUNG);
+			}
 		}
 	}
 
@@ -129,7 +164,7 @@ public class KampungPlan {
 	// (plus a one block walkway around it) is free. the front is always the `width` side,
 	// facing whichever way leads back to the middle of the village
 	private void place(RandomSource random, Kind kind, int width, int depth, int residents, Style style) {
-		int span = EXTENT * 2;
+		int span = extent * 2;
 		int[] spots = new int[span * span * 2];
 		for (int i = 0; i < spots.length; i++) {
 			spots[i] = i;
@@ -144,8 +179,8 @@ public class KampungPlan {
 			boolean turned = spot % 2 == 1;
 			int sizeX = turned ? depth : width;
 			int sizeZ = turned ? width : depth;
-			int x0 = (spot / 2) % span - EXTENT;
-			int z0 = (spot / 2) / span - EXTENT;
+			int x0 = (spot / 2) % span - extent;
+			int z0 = (spot / 2) / span - extent;
 			int x1 = x0 + sizeX - 1;
 			int z1 = z0 + sizeZ - 1;
 			if (!free(x0 - 1, z0 - 1, x1 + 1, z1 + 1)) {
@@ -168,7 +203,7 @@ public class KampungPlan {
 	private boolean free(int x0, int z0, int x1, int z1) {
 		for (int x = x0; x <= x1; x++) {
 			for (int z = z0; z <= z1; z++) {
-				if (Math.abs(x) > EXTENT || Math.abs(z) > EXTENT || taken[x + EXTENT][z + EXTENT]) {
+				if (Math.abs(x) > extent || Math.abs(z) > extent || taken[x + extent][z + extent]) {
 					return false;
 				}
 			}
@@ -177,9 +212,9 @@ public class KampungPlan {
 	}
 
 	private void mark(int x0, int z0, int x1, int z1) {
-		for (int x = Math.max(x0, -EXTENT); x <= Math.min(x1, EXTENT); x++) {
-			for (int z = Math.max(z0, -EXTENT); z <= Math.min(z1, EXTENT); z++) {
-				taken[x + EXTENT][z + EXTENT] = true;
+		for (int x = Math.max(x0, -extent); x <= Math.min(x1, extent); x++) {
+			for (int z = Math.max(z0, -extent); z <= Math.min(z1, extent); z++) {
+				taken[x + extent][z + extent] = true;
 			}
 		}
 	}

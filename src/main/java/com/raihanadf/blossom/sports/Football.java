@@ -4,6 +4,7 @@ import com.geckolib.animatable.GeoEntity;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
 import com.geckolib.animatable.manager.AnimatableManager;
 import com.geckolib.util.GeckoLibUtil;
+import com.raihanadf.blossom.kampung.Warga;
 import com.raihanadf.blossom.registry.BlossomBlocks;
 import com.raihanadf.blossom.registry.BlossomItems;
 import java.util.List;
@@ -20,6 +21,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -79,18 +81,30 @@ public class Football extends Entity implements GeoEntity {
 		}
 	}
 
-	// players walking into it push it along their way
+	// players and kids walking into it push it along their way
 	private void dribble(ServerLevel level) {
-		List<Player> players = level.getEntitiesOfClass(Player.class, getBoundingBox().inflate(0.15), player -> !player.isSpectator());
-		for (Player player : players) {
-			Vec3 away = position().subtract(player.position()).multiply(1, 0, 1);
-			double pace = player.position().subtract(player.xo, player.yo, player.zo).horizontalDistance();
+		List<LivingEntity> feet = level.getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(0.15),
+				entity -> !entity.isSpectator() && (entity instanceof Player || entity instanceof Warga));
+		for (LivingEntity entity : feet) {
+			Vec3 away = position().subtract(entity.position()).multiply(1, 0, 1);
+			double pace = entity.position().subtract(entity.xo, entity.yo, entity.zo).horizontalDistance();
 			if (away.lengthSqr() < 1.0e-4) {
-				away = player.getLookAngle().multiply(1, 0, 1);
+				away = entity.getLookAngle().multiply(1, 0, 1);
 			}
 			setDeltaMovement(away.normalize().scale(0.25 + pace * 1.6).add(0, 0.08, 0));
-			lastKicker = player.getName().getString();
+			lastKicker = entity.getName().getString();
 		}
+	}
+
+	// a pass along the ground towards `direction`
+	public void kick(Entity by, Vec3 direction, double power) {
+		Vec3 flat = direction.multiply(1, 0, 1);
+		if (flat.lengthSqr() < 1.0e-4) {
+			return;
+		}
+		setDeltaMovement(flat.normalize().scale(power).add(0, 0.12, 0));
+		lastKicker = by.getName().getString();
+		playSound(SoundEvents.PLAYER_ATTACK_KNOCKBACK, 0.6f, 1.5f);
 	}
 
 	private void checkGoal(ServerLevel level) {

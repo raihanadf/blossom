@@ -5,6 +5,9 @@ import com.geckolib.renderer.GeoEntityRenderer;
 import com.raihanadf.blossom.Blossom;
 import com.raihanadf.blossom.client.render.CookingPotRenderer;
 import com.raihanadf.blossom.client.render.CuttingBoardRenderer;
+import com.raihanadf.blossom.client.render.TrackRenderer;
+import com.raihanadf.blossom.client.render.LoriRenderer;
+import com.raihanadf.blossom.client.render.TrainRenderer;
 import com.raihanadf.blossom.client.render.WargaRenderer;
 import com.raihanadf.blossom.critters.Critter;
 import com.raihanadf.blossom.registry.BlossomBlocks;
@@ -20,12 +23,13 @@ import net.minecraft.world.entity.EntityType;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.minecraft.client.Minecraft;
 import com.raihanadf.blossom.motor.Motor;
+import com.raihanadf.blossom.nusantara.TrainCar;
 import com.raihanadf.blossom.client.render.RideRenderers;
 
 public class BlossomClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
-		BlockEntityRenderers.register(BlossomBlocks.CUTTING_BOARD_ENTITY, CuttingBoardRenderer::new);
+		BlockEntityRenderers.register(BlossomBlocks.TRACK_ENTITY, TrackRenderer::new);
 		BlockEntityRenderers.register(BlossomBlocks.COOKING_POT_ENTITY, CookingPotRenderer::new);
 		// seats are invisible, the player sitting on them is all you see
 		EntityRenderers.register(BlossomEntities.SEAT, NoopRenderer::new);
@@ -33,13 +37,20 @@ public class BlossomClient implements ClientModInitializer {
 		critter(BlossomEntities.HEDGEHOG, 0.3f);
 		critter(BlossomEntities.CAPYBARA, 0.5f);
 		EntityRenderers.register(BlossomEntities.WARGA, WargaRenderer::new);
+		EntityRenderers.register(BlossomEntities.SATPAM, WargaRenderer::new);
+		EntityRenderers.register(BlossomEntities.TRAIN_CAR, TrainRenderer::new);
+		EntityRenderers.register(BlossomEntities.LORI, LoriRenderer::new);
 		EntityRenderers.register(BlossomEntities.MOTOR, RideRenderers.motor());
 		EntityRenderers.register(BlossomEntities.FOOTBALL, RideRenderers.football());
 		EntityRenderers.register(BlossomEntities.SHUTTLECOCK, RideRenderers.shuttlecock());
+		BatonMotion.init();
+		PlaceHud.init();
 		// every motor that shows up on this client gets its own engine sound
 		ClientEntityEvents.ENTITY_LOAD.register((entity, level) -> {
 			if (entity instanceof Motor motor) {
 				Minecraft.getInstance().getSoundManager().play(new MotorSound(motor));
+			} else if (entity instanceof TrainCar car) {
+				Minecraft.getInstance().getSoundManager().play(new TrainSound(car));
 			}
 		});
 	}

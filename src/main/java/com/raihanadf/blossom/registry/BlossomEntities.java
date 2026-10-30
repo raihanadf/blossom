@@ -5,8 +5,11 @@ import com.raihanadf.blossom.critters.Capybara;
 import com.raihanadf.blossom.critters.Hamster;
 import com.raihanadf.blossom.critters.Hedgehog;
 import com.raihanadf.blossom.furniture.SeatEntity;
+import com.raihanadf.blossom.kampung.Satpam;
 import com.raihanadf.blossom.kampung.Warga;
 import com.raihanadf.blossom.motor.Motor;
+import com.raihanadf.blossom.nusantara.Lori;
+import com.raihanadf.blossom.nusantara.TrainCar;
 import com.raihanadf.blossom.sports.Football;
 import com.raihanadf.blossom.sports.Shuttlecock;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
@@ -41,7 +44,9 @@ public final class BlossomEntities {
 
 	// kampung folk, they live in the villages and never despawn
 	public static final EntityType<Warga> WARGA = register("warga",
-			EntityType.Builder.of(Warga::new, MobCategory.MISC).sized(0.6f, 1.8f).eyeHeight(1.62f).clientTrackingRange(10));
+			EntityType.Builder.of(Warga::new, MobCategory.MISC).sized(0.6f, 1.8f).eyeHeight(1.62f).ridingOffset(-0.6f).clientTrackingRange(10));
+	public static final EntityType<Satpam> SATPAM = register("satpam",
+			EntityType.Builder.of(Satpam::new, MobCategory.MISC).sized(0.6f, 1.8f).eyeHeight(1.62f).ridingOffset(-0.6f).clientTrackingRange(10));
 
 	public static final EntityType<Motor> MOTOR = register("motor",
 			EntityType.Builder.<Motor>of(Motor::new, MobCategory.MISC).sized(0.9f, 1.0f).clientTrackingRange(10));
@@ -49,6 +54,12 @@ public final class BlossomEntities {
 			EntityType.Builder.<Football>of(Football::new, MobCategory.MISC).sized(0.5f, 0.5f).clientTrackingRange(8).updateInterval(1));
 	public static final EntityType<Shuttlecock> SHUTTLECOCK = register("shuttlecock",
 			EntityType.Builder.<Shuttlecock>of(Shuttlecock::new, MobCategory.MISC).sized(0.25f, 0.25f).clientTrackingRange(8).updateInterval(1));
+	// a car of a nusantara train, moved by the server along its line every tick
+	public static final EntityType<TrainCar> TRAIN_CAR = register("train_car",
+			EntityType.Builder.<TrainCar>of(TrainCar::new, MobCategory.MISC).sized(2.8f, 3.7f).noSummon().fireImmune().clientTrackingRange(16).updateInterval(1));
+	// the inspection trolley that runs over a line just before its train, mending it
+	public static final EntityType<Lori> LORI = register("lori",
+			EntityType.Builder.<Lori>of(Lori::new, MobCategory.MISC).sized(1.9f, 2.1f).noSummon().fireImmune().clientTrackingRange(12).updateInterval(1));
 
 	private BlossomEntities() {
 	}
@@ -71,8 +82,9 @@ public final class BlossomEntities {
 				MobCategory.CREATURE, CAPYBARA, 6, 2, 4);
 
 		FabricDefaultAttributeRegistry.register(WARGA, Warga.createAttributes());
+		FabricDefaultAttributeRegistry.register(SATPAM, Satpam.createAttributes());
 
-		for (EntityType<?> type : new EntityType<?>[] {HAMSTER, HEDGEHOG, CAPYBARA, WARGA}) {
+		for (EntityType<?> type : new EntityType<?>[] {HAMSTER, HEDGEHOG, CAPYBARA, WARGA, SATPAM}) {
 			BlossomItems.register(BuiltInRegistries.ENTITY_TYPE.getKey(type).getPath() + "_spawn_egg", SpawnEggItem::new, new Item.Properties().spawnEgg(type));
 		}
 	}

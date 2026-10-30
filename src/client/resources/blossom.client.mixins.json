@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "com.raihanadf.blossom.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "FirstPersonHandsMixin",
+    "BatonPlayerModelMixin",
+    "MinecraftAttackMixin",
+    "WorldCreationMixin",
+    "LogoMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

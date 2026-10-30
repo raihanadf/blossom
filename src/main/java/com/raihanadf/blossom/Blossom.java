@@ -1,5 +1,7 @@
 package com.raihanadf.blossom;
 
+import com.raihanadf.blossom.nusantara.PlaceTracker;
+import com.raihanadf.blossom.nusantara.TrainSystem;
 import com.raihanadf.blossom.pets.PetFeeding;
 import com.raihanadf.blossom.registry.BlossomBlocks;
 import com.raihanadf.blossom.registry.BlossomEntities;
@@ -20,6 +22,8 @@ public class Blossom implements ModInitializer {
 		BlossomEntities.init();
 		BlossomWorldgen.init();
 		PetFeeding.init();
+		TrainSystem.init();
+		PlaceTracker.init();
 		BlossomItems.init();
 		LOGGER.info("blossom loaded");
 	}

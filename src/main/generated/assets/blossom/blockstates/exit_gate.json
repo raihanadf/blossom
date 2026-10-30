@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "blossom:block/exit_gate",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "blossom:block/exit_gate"
+    },
+    "facing=south": {
+      "model": "blossom:block/exit_gate",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "blossom:block/exit_gate",
+      "y": 270
+    }
+  }
+}

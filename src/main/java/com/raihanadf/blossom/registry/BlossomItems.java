@@ -2,6 +2,7 @@ package com.raihanadf.blossom.registry;
 
 import com.raihanadf.blossom.Blossom;
 import com.raihanadf.blossom.cooking.DishItem;
+import com.raihanadf.blossom.kampung.BatonItem;
 import com.raihanadf.blossom.motor.PlaceEntityItem;
 import com.raihanadf.blossom.sports.RacketItem;
 import java.util.function.Function;
@@ -26,8 +27,8 @@ public final class BlossomItems {
 
 	// cooking tools and chopped ingredients
 	public static final Item KITCHEN_KNIFE = register("kitchen_knife", Item::new, new Item.Properties().durability(250));
-	// pentungan: the kampung satpam's night stick, a light wooden weapon
-	public static final Item BATON = register("baton", Item::new, new Item.Properties().sword(ToolMaterial.WOOD, 3.0f, -2.2f));
+	// pentungan: the kampung satpam's night stick
+	public static final Item BATON = register("baton", BatonItem::new, new Item.Properties().stacksTo(1));
 	public static final Item CARROT_SLICES = register("carrot_slices", Item::new, new Item.Properties());
 	public static final Item POTATO_WEDGES = register("potato_wedges", Item::new, new Item.Properties());
 	public static final Item APPLE_SLICES = register("apple_slices", Item::new, new Item.Properties().food(food(2, 0.3f)));
@@ -44,6 +45,10 @@ public final class BlossomItems {
 	public static final Item FOOTBALL = register("football", p -> new PlaceEntityItem(BlossomEntities.FOOTBALL, p), new Item.Properties().stacksTo(16));
 	public static final Item RACKET = register("racket", p -> new RacketItem(p, false), new Item.Properties().stacksTo(1));
 	public static final Item SHUTTLECOCK = register("shuttlecock", p -> new RacketItem(p, true), new Item.Properties().stacksTo(16));
+	// the model a piece of track is drawn with (not an item anyone holds)
+	public static final Item TRACK_PIECE = register("track_piece", Item::new, new Item.Properties());
+	// a train ticket: one iron from the station master, let in once through the ticket gate
+	public static final Item TICKET = register("ticket", Item::new, new Item.Properties());
 
 	// dishes from the cooking pot, eaten from a bowl
 	public static final Item CARROT_SOUP = dish("carrot_soup", 8, 0.7f);
@@ -60,12 +65,13 @@ public final class BlossomItems {
 	}
 
 	public static void init() {
+		BatonItem.init();
 		// every blossom item shows up in our own tab, in registration order, except the heart that only serves as its icon
 		Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, TAB, FabricCreativeModeTab.builder()
 				.title(Component.translatable("itemGroup.blossom"))
 				.icon(() -> new ItemStack(BLOSSOM_HEART))
 				.displayItems((params, output) -> BuiltInRegistries.ITEM.stream()
-						.filter(item -> item != BLOSSOM_HEART && BuiltInRegistries.ITEM.getKey(item).getNamespace().equals(Blossom.MOD_ID))
+						.filter(item -> item != BLOSSOM_HEART && item != TRACK_PIECE && BuiltInRegistries.ITEM.getKey(item).getNamespace().equals(Blossom.MOD_ID))
 						.forEach(output::accept))
 				.build());
 	}

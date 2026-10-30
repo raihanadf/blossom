@@ -29,5 +29,9 @@
 		"java": ">=25",
 		"fabric-api": "*",
 		"geckolib": ">=5.5.7"
-	}
+	},
+	"mixins": [
+		"blossom.mixins.json",
+		"blossom.client.mixins.json"
+	]
 }

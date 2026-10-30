@@ -5,11 +5,14 @@ import static com.raihanadf.blossom.registry.BlossomBlocks.COOKING_POT;
 import static com.raihanadf.blossom.registry.BlossomBlocks.CUTTING_BOARD;
 import static com.raihanadf.blossom.registry.BlossomBlocks.GOAL_NET;
 import static com.raihanadf.blossom.registry.BlossomBlocks.SPORTS_NET;
+import static com.raihanadf.blossom.registry.BlossomBlocks.TICKET_GATE;
+import static com.raihanadf.blossom.registry.BlossomBlocks.EXIT_GATE;
 import static com.raihanadf.blossom.registry.BlossomBlocks.LAMP;
 import static com.raihanadf.blossom.registry.BlossomBlocks.RICE;
 import static com.raihanadf.blossom.registry.BlossomBlocks.RICE_CROP;
 import static com.raihanadf.blossom.registry.BlossomBlocks.TABLES;
 import static com.raihanadf.blossom.registry.BlossomBlocks.WOODS;
+import static com.raihanadf.blossom.registry.BlossomBlocks.TRACK;
 import static com.raihanadf.blossom.registry.BlossomItems.APPLE_PORRIDGE;
 import static com.raihanadf.blossom.registry.BlossomItems.BATON;
 import static com.raihanadf.blossom.registry.BlossomItems.FOOTBALL;
@@ -36,6 +39,8 @@ import static com.raihanadf.blossom.registry.BlossomItems.POTATO_WEDGES;
 import static com.raihanadf.blossom.registry.BlossomItems.TAB;
 import static com.raihanadf.blossom.registry.BlossomItems.VEGGIE_STEW;
 
+import static com.raihanadf.blossom.registry.BlossomItems.TICKET;
+import static com.raihanadf.blossom.registry.BlossomItems.TRACK_PIECE;
 import com.google.gson.JsonObject;
 import com.raihanadf.blossom.Blossom;
 import com.raihanadf.blossom.furniture.LampBlock;
@@ -97,10 +102,19 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 					blocks.blockStateOutput.accept(MultiVariantGenerator.dispatch(block, BlockModelGenerators.plainVariant(model)));
 					blocks.registerSimpleItemModel(block, model);
 				}
+				Identifier track = Blossom.id("block/track");
+				blocks.blockStateOutput.accept(MultiVariantGenerator.dispatch(TRACK, BlockModelGenerators.plainVariant(track)));
+				blocks.registerSimpleItemModel(TRACK, track);
 				Identifier net = Blossom.id("block/sports_net");
 				blocks.blockStateOutput.accept(MultiVariantGenerator.dispatch(SPORTS_NET, BlockModelGenerators.plainVariant(net))
 						.with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING));
 				blocks.registerSimpleItemModel(SPORTS_NET, net);
+				for (Block gate : List.of(TICKET_GATE, EXIT_GATE)) {
+					Identifier model = Blossom.id("block/" + name(gate));
+					blocks.blockStateOutput.accept(MultiVariantGenerator.dispatch(gate, BlockModelGenerators.plainVariant(model))
+							.with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING));
+					blocks.registerSimpleItemModel(gate, model);
+				}
 
 				// furniture reuses one template per shape, filled with the vanilla planks of its wood
 				for (String wood : WOODS) {
@@ -148,15 +162,17 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 					items.generateFlatItem(item, ModelTemplates.FLAT_ITEM);
 				}
 				items.generateFlatItem(KITCHEN_KNIFE, ModelTemplates.FLAT_HANDHELD_ITEM);
-				items.generateFlatItem(BATON, ModelTemplates.FLAT_HANDHELD_ITEM);
+				items.declareCustomModelItem(BATON);
+				items.declareCustomModelItem(TRACK_PIECE);
 				items.generateFlatItem(RACKET, ModelTemplates.FLAT_HANDHELD_ITEM);
-				for (Item item : List.of(PET_TREAT, MOTOR, FOOTBALL, SHUTTLECOCK)) {
+				for (Item item : List.of(PET_TREAT, MOTOR, FOOTBALL, SHUTTLECOCK, TICKET)) {
 					items.generateFlatItem(item, ModelTemplates.FLAT_ITEM);
 				}
 				for (EntityType<?> critter : CRITTERS) {
 					items.generateFlatItem(spawnEgg(critter), ModelTemplates.FLAT_ITEM);
 				}
 				items.generateFlatItem(spawnEgg(BlossomEntities.WARGA), ModelTemplates.FLAT_ITEM);
+				items.generateFlatItem(spawnEgg(BlossomEntities.SATPAM), ModelTemplates.FLAT_ITEM);
 			}
 		});
 
@@ -306,6 +322,8 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 				builder.add(CUTTING_BOARD, "Cutting Board");
 				builder.add(COOKING_POT, "Cooking Pot");
 				builder.add(LAMP, "Lamp");
+				builder.add(TRACK, "Track");
+				builder.add(TRACK_PIECE, "Track Piece");
 				for (String wood : WOODS) {
 					String name = titleCase(wood);
 					builder.add(CHAIRS.get(wood), name + " Chair");
@@ -337,7 +355,42 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 						"Good afternoon! Come by any time.", "Have you eaten yet?", "Lovely weather today, isn't it?",
 						"The rice is coming along nicely!", "Mind the paddy, it's muddy.", "Harvest is soon, insyaallah.",
 						"Something good is on the stove!", "Wait a bit, it's almost ready.", "Come back later, I'll cook some more.",
-						"Welcome! Everything's safe here.", "I'm on watch, don't worry.", "If you need anything, report to the post.");
+						"Welcome! Everything's safe here.", "I'm on watch, don't worry.", "If you need anything, report to the post.",
+						"Wanna play football?", "Catch me if you can!", "School's out!",
+						"Mind the gap, the train is coming in.", "This train goes on to the next station.", "Tickets at the loket, please.",
+						"Waiting for my train...", "I'm off to visit my family.", "The train is always a bit late, hehe.",
+						"Snacks, snacks! Fresh and tasty!", "Something for the trip?", "Come back for more later!",
+						"What a lovely kampung.", "Just got off the train!", "I'll head back to the station soon.",
+						"Rails all clear up ahead!", "Inspecting the line before the train comes.", "Keep off the track, please.");
+				builder.add(BlossomEntities.SATPAM, "Satpam");
+				builder.add(spawnEgg(BlossomEntities.SATPAM), "Satpam Spawn Egg");
+				builder.add("key.categories.blossom", "Blossom");
+				builder.add("key.blossom.inspect", "Inspect Baton");
+				builder.add("message.blossom.warga.vendor_gift", "Here you go, one %s!");
+				builder.add("generator.blossom.nusantara", "Nusantara");
+				builder.add("generator.blossom.nusantara.info", "Indonesia in the 80s and 90s: towns, kampungs and sawah joined by a winding railway.");
+				builder.add(BlossomEntities.TRAIN_CAR, "Train");
+				builder.add(BlossomEntities.LORI, "Inspection Trolley");
+				builder.add("message.blossom.train.next", "KA %s · next stop: %s");
+				builder.add("message.blossom.train.stopped", "KA %s · now at %s, sneak to get off");
+				builder.add("message.blossom.train.full", "This car is full, try another one");
+				builder.add("message.blossom.lori.stop", "Something's on the line up ahead, let's sort it out.");
+				builder.add("message.blossom.lori.done", "All clear, let's go!");
+				builder.add("message.blossom.lori.hurry", "Let's wrap this up, the train is waiting!");
+				builder.add("message.blossom.lori.radio", "%s (radio): line clear, the train at %s may go.");
+				builder.add("message.blossom.train.waiting", "KA %s · at %s, waiting for the line to be cleared");
+				builder.add("message.blossom.train.cleared", "Stasiun %s (radio): the lori is in, the line to %s is clear.");
+				builder.add(TICKET, "Train Ticket");
+				builder.add(TICKET_GATE, "Ticket Gate");
+				builder.add(EXIT_GATE, "Exit Gate");
+				builder.add("message.blossom.gate.welcome", "Ticket checked, have a good trip!");
+				builder.add("message.blossom.ticket.sold", "One ticket, here you are. Have a good trip!");
+				builder.add("message.blossom.ticket.price", "A ticket is one iron ingot");
+				builder.add("hud.blossom.place.station", "Stasiun %s");
+				builder.add("hud.blossom.place.tier0", "Desa %s");
+				builder.add("hud.blossom.place.tier1", "Desa %s");
+				builder.add("hud.blossom.place.tier2", "Kota %s");
+				builder.add("hud.blossom.place.tier3", "Kota %s");
 				builder.add("message.blossom.pot.empty", "Drop some ingredients in!");
 				builder.add("message.blossom.pot.no_recipe", "Hmm, these don't make a dish yet");
 				builder.add("message.blossom.pot.no_heat", "Needs a fire, campfire, lava or magma underneath");
@@ -354,6 +407,8 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 				builder.add(CUTTING_BOARD, "Talenan");
 				builder.add(COOKING_POT, "Panci Masak");
 				builder.add(LAMP, "Lampu");
+				builder.add(TRACK, "Rel");
+				builder.add(TRACK_PIECE, "Potongan Rel");
 				for (String wood : WOODS) {
 					builder.add(CHAIRS.get(wood), "Kursi " + WOOD_ID.get(wood));
 					builder.add(TABLES.get(wood), "Meja " + WOOD_ID.get(wood));
@@ -384,7 +439,42 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 						"Sugeng siang! Mampir sini aja.", "Sudah makan belum?", "Cuacanya enak ya hari ini.",
 						"Padinya lagi bagus-bagusnya!", "Hati-hati, sawahnya becek.", "Sebentar lagi panen, insyaallah.",
 						"Lagi masak yang enak nih!", "Tunggu sebentar ya, hampir matang.", "Nanti mampir lagi, saya masakin.",
-						"Selamat datang! Aman terkendali.", "Saya jaga di sini, tenang saja.", "Kalau ada perlu, lapor ke pos ya.");
+						"Selamat datang! Aman terkendali.", "Saya jaga di sini, tenang saja.", "Kalau ada perlu, lapor ke pos ya.",
+						"Main bola yuk!", "Ayo kejar aku!", "Asyik, sudah pulang sekolah!",
+						"Awas, kereta mau masuk.", "Kereta ini lanjut ke stasiun berikutnya.", "Karcisnya di loket ya.",
+						"Lagi nunggu kereta...", "Mau ke rumah saudara.", "Keretanya suka telat dikit, hehe.",
+						"Jajan, jajan! Masih anget!", "Buat bekal di jalan?", "Nanti mampir lagi ya!",
+						"Kampungnya asri ya.", "Baru turun dari kereta!", "Sebentar lagi balik ke stasiun.",
+						"Rel aman, siap dilewati!", "Lagi periksa jalur sebelum kereta lewat.", "Jangan main di rel ya.");
+				builder.add(BlossomEntities.SATPAM, "Satpam");
+				builder.add(spawnEgg(BlossomEntities.SATPAM), "Telur Spawn Satpam");
+				builder.add("key.categories.blossom", "Blossom");
+				builder.add("key.blossom.inspect", "Periksa Pentungan");
+				builder.add("message.blossom.warga.vendor_gift", "Monggo, %s-nya satu!");
+				builder.add("generator.blossom.nusantara", "Nusantara");
+				builder.add("generator.blossom.nusantara.info", "Indonesia tahun 80-90an: kota, kampung, dan sawah dihubungkan rel kereta yang berkelok.");
+				builder.add(BlossomEntities.TRAIN_CAR, "Kereta");
+				builder.add(BlossomEntities.LORI, "Lori Inspeksi");
+				builder.add("message.blossom.train.next", "KA %s · stasiun berikutnya: %s");
+				builder.add("message.blossom.train.stopped", "KA %s · berhenti di %s, jongkok untuk turun");
+				builder.add("message.blossom.train.full", "Gerbong ini penuh, coba gerbong lain");
+				builder.add("message.blossom.lori.stop", "Ada yang ganggu rel di depan, kita beresin dulu.");
+				builder.add("message.blossom.lori.done", "Rel aman, lanjut jalan!");
+				builder.add("message.blossom.lori.hurry", "Ayo cepat beresin, keretanya nunggu!");
+				builder.add("message.blossom.lori.radio", "%s (radio): jalur aman, kereta di %s silakan berangkat.");
+				builder.add("message.blossom.train.waiting", "KA %s · di %s, menunggu jalur aman");
+				builder.add("message.blossom.train.cleared", "Stasiun %s (radio): lori sudah masuk, jalur ke %s aman.");
+				builder.add(TICKET, "Karcis Kereta");
+				builder.add(TICKET_GATE, "Pintu Masuk Peron");
+				builder.add(EXIT_GATE, "Pintu Keluar Peron");
+				builder.add("message.blossom.gate.welcome", "Karcis sudah dicek, selamat jalan!");
+				builder.add("message.blossom.ticket.sold", "Satu karcis, ini dia. Selamat jalan!");
+				builder.add("message.blossom.ticket.price", "Karcisnya satu batang besi");
+				builder.add("hud.blossom.place.station", "Stasiun %s");
+				builder.add("hud.blossom.place.tier0", "Desa %s");
+				builder.add("hud.blossom.place.tier1", "Desa %s");
+				builder.add("hud.blossom.place.tier2", "Kota %s");
+				builder.add("hud.blossom.place.tier3", "Kota %s");
 				builder.add("message.blossom.pot.empty", "Masukin bahan-bahannya dulu!");
 				builder.add("message.blossom.pot.no_recipe", "Hmm, bahan ini belum jadi masakan apa-apa");
 				builder.add("message.blossom.pot.no_heat", "Butuh api, api unggun, lava, atau magma di bawahnya");
@@ -435,7 +525,7 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 		builder.add(spawnEgg(BlossomEntities.WARGA), egg);
 		builder.add("message.blossom.warga.says", "%s: %s");
 		builder.add("message.blossom.warga.cook_gift", gift);
-		List<String> jobs = List.of("resident", "farmer", "cook", "guard");
+		List<String> jobs = List.of("resident", "farmer", "cook", "guard", "kid", "ppka", "passenger", "vendor", "traveler", "inspector");
 		for (int i = 0; i < lines.length; i++) {
 			builder.add("message.blossom.warga." + jobs.get(i / 3) + "." + i % 3, lines[i]);
 		}

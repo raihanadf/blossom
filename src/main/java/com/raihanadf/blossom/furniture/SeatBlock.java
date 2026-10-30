@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -43,6 +44,12 @@ public class SeatBlock extends Block {
 	}
 
 	// holding something (like a vanilla cushion to put on the seat) lets that item act, you sit with an empty hand
+	// mobs walk round furniture, not through it (the pathfinder would think a chair or table is open ground)
+	@Override
+	protected boolean isPathfindable(BlockState state, PathComputationType type) {
+		return false;
+	}
+
 	@Override
 	protected InteractionResult useItemOn(ItemStack held, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
 		return held.isEmpty() ? InteractionResult.TRY_WITH_EMPTY_HAND : InteractionResult.PASS;

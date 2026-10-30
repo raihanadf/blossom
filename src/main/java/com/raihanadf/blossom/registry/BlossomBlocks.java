@@ -9,6 +9,9 @@ import com.raihanadf.blossom.cooking.RiceCropBlock;
 import com.raihanadf.blossom.furniture.LampBlock;
 import com.raihanadf.blossom.furniture.SeatBlock;
 import com.raihanadf.blossom.furniture.ShapedBlock;
+import com.raihanadf.blossom.nusantara.StationGate;
+import com.raihanadf.blossom.nusantara.TrackBlock;
+import com.raihanadf.blossom.nusantara.TrackBlockEntity;
 import com.raihanadf.blossom.sports.NetBlock;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -58,6 +61,17 @@ public final class BlossomBlocks {
 			.mapColor(MapColor.WOOL).strength(0.3f).sound(SoundType.WOOL).noCollision().noOcclusion());
 	public static final Block SPORTS_NET = register("sports_net", NetBlock::new, BlockBehaviour.Properties.of()
 			.mapColor(MapColor.WOOL).strength(0.3f).sound(SoundType.WOOL).noOcclusion());
+
+	public static final Block TRACK = register("track", TrackBlock::new, BlockBehaviour.Properties.of()
+			.mapColor(MapColor.METAL).strength(0.7f).sound(SoundType.METAL).noCollision().noOcclusion());
+	// the gates in the station fence: in with a karcis, out for anyone
+	public static final Block TICKET_GATE = register("ticket_gate", p -> new StationGate(p, false), BlockBehaviour.Properties.of()
+			.mapColor(MapColor.METAL).strength(2f).sound(SoundType.METAL).noOcclusion().dynamicShape());
+	public static final Block EXIT_GATE = register("exit_gate", p -> new StationGate(p, true), BlockBehaviour.Properties.of()
+			.mapColor(MapColor.METAL).strength(2f).sound(SoundType.METAL).noOcclusion().dynamicShape());
+
+	public static final BlockEntityType<TrackBlockEntity> TRACK_ENTITY = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE,
+			Blossom.id("track"), new BlockEntityType<>(TrackBlockEntity::new, Set.of(TRACK)));
 
 	public static final BlockEntityType<CuttingBoardBlockEntity> CUTTING_BOARD_ENTITY = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE,
 			Blossom.id("cutting_board"), new BlockEntityType<>(CuttingBoardBlockEntity::new, Set.of(CUTTING_BOARD)));
