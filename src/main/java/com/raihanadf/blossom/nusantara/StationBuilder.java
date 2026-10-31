@@ -15,15 +15,17 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CropBlock;
+import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.SlabType;
+import net.minecraft.world.level.block.state.properties.StairsShape;
 
 // the station of a settlement and the country around it: a white station hall in the middle of a ring road, a
 // platform beside the line out of each port, a little plaza on the side facing the settlement, the roads to the
@@ -31,6 +33,8 @@ import net.minecraft.world.level.block.state.properties.SlabType;
 public final class StationBuilder {
 	// how far out from the yard its slopes back to the land reach
 	private static final int SLOPES = 40;
+	// how deep a road may cut into a hill before it tunnels through instead
+	private static final int TUNNEL_DEPTH = 5;
 
 	private StationBuilder() {
 	}
@@ -76,11 +80,26 @@ public final class StationBuilder {
 					site.level(x, g, z, "grass_block");
 					continue;
 				}
-				int land = site.ground(x, z, true);
-				double width = Mth.clamp(Math.abs(land - g) * 2, 8, SLOPES) * (1 + 0.25 * Math.sin(x * 0.21 + z * 0.13) * Math.cos(z * 0.17 - x * 0.07));
-				site.blend(x, z, g, out, (int) Math.round(width));
+				site.blend(x, z, g, out, (int) Math.round(slopeWidth(x, z, site.ground(x, z, true), g)));
 			}
 		}
+	}
+
+	// how wide the slope from the yard back to the land is here: wider the more height it makes up, wavy
+	private static double slopeWidth(int x, int z, int land, int g) {
+		return Mth.clamp(Math.abs(land - g) * 2, 8, SLOPES) * (1 + 0.25 * Math.sin(x * 0.21 + z * 0.13) * Math.cos(z * 0.17 - x * 0.07));
+	}
+
+	// the height of the ground at a column once the station is built: the yard's level inside it, sloping back to
+	// `land` (the natural ground) over the slopes round it
+	public static int groundAt(Settlement s, int x, int z, int land) {
+		double out = yard(s, x, z);
+		int g = s.node.ground();
+		if (out > SLOPES) {
+			return land;
+		}
+		double width = Math.round(slopeWidth(x, z, land, g));
+		return (int) Math.round(g + (land - g) * Math.min(1, Math.max(0, out / width)));
 	}
 
 	// whole trees in a column: trunks, leaves, vines, bamboo and big mushrooms, from the ground up
@@ -88,6 +107,9 @@ public final class StationBuilder {
 		int ground = site.ground(x, z, false);
 		for (int y = ground + 1; y <= ground + 36; y++) {
 			BlockState state = site.get(x, y, z);
+			if (Site.planted(state)) {
+				continue;
+			}
 			if (state.is(BlockTags.LEAVES) || state.is(BlockTags.LOGS) || state.is(Blocks.VINE) || state.is(Blocks.BAMBOO) || state.is(Blocks.MUSHROOM_STEM)
 					|| state.is(Blocks.RED_MUSHROOM_BLOCK) || state.is(Blocks.BROWN_MUSHROOM_BLOCK) || state.is(Blocks.COCOA)) {
 				site.set(x, y, z, Blocks.AIR.defaultBlockState());
@@ -115,6 +137,8 @@ public final class StationBuilder {
 			}
 			hall(site, s, s.hallX(), s.hallZ(), g);
 			plaza(site, s, g);
+			StationGrounds.forecourt(site, s, g, random);
+			perimeter(site, s, g);
 			// trains run straight on through the station: one set of platforms per line, on the settlement's side
 			for (boolean row : new boolean[] {true, false}) {
 				if (!s.ports[row ? 0 : 1] && !s.ports[row ? 2 : 3]) {
@@ -365,6 +389,90 @@ public final class StationBuilder {
 		}
 	}
 
+	// the station grounds are closed in all round, as at lempuyangan or tugu: on the settlement's side, round the
+	// forecourt, a low plastered wall with square pillars and iron railings on top, each pillar capped with a white
+	// finial and every few a lamp; everywhere else a tall plain wall. the lines go out through gaps at the ends of
+	// their arms (siding and all), and where a road leaves the forecourt stand two tall gate pillars
+	private static void perimeter(Site site, Settlement s, int g) {
+		int x0 = s.node.x();
+		int z0 = s.node.z();
+		int bx = x0 + s.qx * 46;
+		int bz = z0 + s.qz * 46;
+		for (int x = site.box.minX(); x <= site.box.maxX(); x++) {
+			for (int z = site.box.minZ(); z <= site.box.maxZ(); z++) {
+				if (!site.has(x, z) || yard(s, x, z) > 0) {
+					continue;
+				}
+				boolean east = yard(s, x + 1, z) > 0;
+				boolean west = yard(s, x - 1, z) > 0;
+				boolean south = yard(s, x, z + 1) > 0;
+				boolean north = yard(s, x, z - 1) > 0;
+				if (!east && !west && !south && !north) {
+					continue;
+				}
+				// where the lines leave the station: the tracks, the siding and their ballast
+				boolean rowLine = (s.ports[0] || s.ports[2]) && Math.abs(z - z0) <= 9 && Math.abs(x - x0) > 14;
+				boolean columnLine = (s.ports[1] || s.ports[3]) && Math.abs(x - x0) <= 9 && Math.abs(z - z0) > 14;
+				if (rowLine || columnLine) {
+					continue;
+				}
+				double road = Double.MAX_VALUE;
+				for (int[] r : s.roads()) {
+					road = Math.min(road, Settlement.distanceToSegment(x + 0.5, z + 0.5, r));
+				}
+				if (road < 2.6) {
+					continue;
+				}
+				boolean front = x >= Math.min(x0, bx) && x <= Math.max(x0, bx) && z >= Math.min(z0, bz) && z <= Math.max(z0, bz)
+						&& Math.abs(x - x0) > 14 && Math.abs(z - z0) > 14;
+				boolean corner = (east || west) && (south || north);
+				int along = east || west ? z : x;
+				if (road < 4) {
+					gatePillar(site, x, g, z);
+				} else if (front) {
+					railing(site, x, g, z, corner || Math.floorMod(along, 4) == 0, Math.floorMod(along, 12) == 0, east || west);
+				} else {
+					wall(site, x, g, z, corner || Math.floorMod(along, 6) == 0);
+				}
+			}
+		}
+	}
+
+	// the forecourt railing: a plastered plinth with iron bars above it, or a pillar with its cap and finial
+	private static void railing(Site site, int x, int g, int z, boolean pillar, boolean lamp, boolean alongZ) {
+		site.set(x, g, z, "stone_bricks");
+		site.set(x, g + 1, z, "polished_andesite");
+		if (pillar) {
+			site.set(x, g + 2, z, "light_gray_concrete");
+			site.set(x, g + 3, z, "light_gray_concrete");
+			site.set(x, g + 4, z, "smooth_quartz");
+			site.set(x, g + 5, z, lamp ? Site.block("lantern") : Site.block("end_rod").setValue(BlockStateProperties.FACING, Direction.UP));
+			return;
+		}
+		site.set(x, g + 2, z, "iron_bars");
+		site.set(x, g + 3, z, "iron_bars");
+		site.set(x, g + 4, z, "air");
+	}
+
+	// the wall round the rest of the grounds: a grey plinth, plastered white, a grey coping, a pillar now and then
+	private static void wall(Site site, int x, int g, int z, boolean pillar) {
+		site.set(x, g, z, "stone_bricks");
+		site.set(x, g + 1, z, "light_gray_concrete");
+		site.set(x, g + 2, z, pillar ? "light_gray_concrete" : "white_concrete");
+		site.set(x, g + 3, z, pillar ? "light_gray_concrete" : "white_concrete");
+		site.set(x, g + 4, z, pillar ? Site.block("smooth_stone") : Site.block("smooth_stone_slab").setValue(BlockStateProperties.SLAB_TYPE, SlabType.BOTTOM));
+	}
+
+	// one side of the way in from a road: a tall pillar with a lamp on top
+	private static void gatePillar(Site site, int x, int g, int z) {
+		site.set(x, g, z, "stone_bricks");
+		for (int y = g + 1; y <= g + 4; y++) {
+			site.set(x, y, z, y == g + 1 ? "polished_andesite" : "light_gray_concrete");
+		}
+		site.set(x, g + 5, z, "smooth_quartz");
+		site.set(x, g + 6, z, "lantern");
+	}
+
 	// platforms beside the line out of one port: raised paving, canopies near the hall, benches, lamps and name boards
 	private static void platforms(Site site, Settlement s, Edge edge, int port, int x0, int z0, int g, RandomSource random) {
 		int dx = NusantaraNetwork.DX[port];
@@ -388,13 +496,15 @@ public final class StationBuilder {
 				int bx = x0 + dx * along + ax * side * outer;
 				int bz = z0 + dz * along + az * side * outer;
 				int from = along - NusantaraNetwork.PLATFORM_START;
+				// the way in from the gates stays open: no bench, bin or post right behind the gate line
+				boolean byGates = along >= Settlement.ENTRY_ALONG - 1 && along <= Settlement.EXIT_ALONG + 1;
 				if (from > 2 && from < 40) {
 					// the canopy, a post every eight blocks with a lantern hanging from it
 					for (int k = inner; k <= outer; k++) {
 						site.set(x0 + dx * along + ax * side * k, g + 6, z0 + dz * along + az * side * k,
 								Site.block("dark_oak_slab").setValue(BlockStateProperties.SLAB_TYPE, SlabType.BOTTOM));
 					}
-					if (from % 8 == 4) {
+					if (from % 8 == 4 && !byGates) {
 						for (int y = g + 2; y <= g + 5; y++) {
 							site.set(bx, y, bz, "green_terracotta");
 						}
@@ -402,7 +512,7 @@ public final class StationBuilder {
 								Site.block("lantern").setValue(BlockStateProperties.HANGING, true));
 					}
 				}
-				if (from % 8 == 0 && from > 0 && from < 60) {
+				if (from % 8 == 0 && from > 0 && from < 60 && !byGates) {
 					Direction toTrack = Direction.getNearest(-ax * side, 0, -az * side, null);
 					site.set(bx, g + 2, bz, BlossomBlocks.CHAIRS.get("spruce").defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, toTrack));
 				}
@@ -417,8 +527,17 @@ public final class StationBuilder {
 			}
 		}
 		fenceAndGates(site, s, port, x0, z0, g, inner);
+		// a bin every so often along the back of each platform
+		for (int along = NusantaraNetwork.PLATFORM_START + 10; along < NusantaraNetwork.PLATFORM_END; along += 16) {
+			if (along >= Settlement.ENTRY_ALONG - 1 && along <= Settlement.EXIT_ALONG + 1) {
+				continue;
+			}
+			for (int side : new int[] {-1, 1}) {
+				site.set(x0 + dx * along + ax * side * (inner + 2), g + 2, z0 + dz * along + az * side * (inner + 2), "cauldron");
+			}
+		}
 		// people waiting for the train
-		for (int i = 0; i < 2 + random.nextInt(2); i++) {
+		for (int i = 0; i < 4 + random.nextInt(3); i++) {
 			int along = NusantaraNetwork.PLATFORM_START + 8 + random.nextInt(48);
 			int side = random.nextBoolean() ? 1 : -1;
 			int x = x0 + dx * along + ax * side * (inner + 1);
@@ -427,9 +546,10 @@ public final class StationBuilder {
 		}
 	}
 
-	// the platforms are closed off: a fence along the outside of both and across their ends (the tracks stay open), a
-	// plank walkway over the tracks between the two, and on the settlement's side the ticket gate and the exit gate,
-	// with a path out to the hall and signs over them
+	// the platforms are closed off as at a real station: a railing two high (iron bars between concrete posts) along
+	// the outside of both and across their ends (the tracks stay open), a plank walkway over the tracks between the
+	// two, and on the settlement's side the gate line: a frame over the ticket gate (MASUK) and the exit gate
+	// (KELUAR) with the checker's desk between them, opening onto the covered concourse to the hall
 	private static void fenceAndGates(Site site, Settlement s, int port, int x0, int z0, int g, int inner) {
 		int dx = NusantaraNetwork.DX[port];
 		int dz = NusantaraNetwork.DZ[port];
@@ -438,34 +558,50 @@ public final class StationBuilder {
 		Settlement.Gates gates = s.gates(port % 2 == 0);
 		int near = gates.side();
 		int fence = Settlement.FENCE;
+		int frameFrom = Settlement.ENTRY_ALONG - 1;
+		int frameTo = Settlement.EXIT_ALONG + 1;
 		for (int side : new int[] {-1, 1}) {
+			Direction in = Direction.getNearest(-ax * side, 0, -az * side, null);
 			for (int along = NusantaraNetwork.PLATFORM_START - 1; along <= NusantaraNetwork.PLATFORM_END + 1; along++) {
 				int x = x0 + dx * along + ax * side * fence;
 				int z = z0 + dz * along + az * side * fence;
-				boolean gate = side == near && (along == Settlement.ENTRY_ALONG || along == Settlement.EXIT_ALONG);
-				if (gate) {
-					Direction in = Direction.getNearest(-ax * side, 0, -az * side, null);
-					site.set(x, g + 1, z, (along == Settlement.ENTRY_ALONG ? BlossomBlocks.TICKET_GATE : BlossomBlocks.EXIT_GATE).defaultBlockState()
-							.setValue(StationGate.FACING, in));
-					site.set(x, g + 2, z, "air");
-					// a path from the gate out towards the hall, and a sign over the way in and out
-					for (int k = fence + 1; k <= fence + 7; k++) {
-						site.set(x0 + dx * along + ax * side * k, g, z0 + dz * along + az * side * k, "dirt_path");
-						site.clearAbove(x0 + dx * along + ax * side * k, g, z0 + dz * along + az * side * k);
+				if (side == near && along >= frameFrom && along <= frameTo) {
+					// the gate line stands at platform height (one block over the concourse): posts at both ends, a beam
+					// over everything two clear blocks above the gates, the gates and the desk between. each gate has a
+					// stone step up from the concourse, so players and villagers walk through without jumping
+					Direction out = in.getOpposite();
+					int ox = x + out.getStepX();
+					int oz = z + out.getStepZ();
+					site.set(x, g, z, "stone_bricks");
+					site.set(x, g + 4, z, "light_gray_concrete");
+					if (along == frameFrom || along == frameTo) {
+						for (int y = g + 1; y <= g + 3; y++) {
+							site.set(x, y, z, "light_gray_concrete");
+						}
+					} else if (along == Settlement.ENTRY_ALONG || along == Settlement.EXIT_ALONG) {
+						site.set(x, g + 1, z, "smooth_stone");
+						site.set(x, g + 2, z, (along == Settlement.ENTRY_ALONG ? BlossomBlocks.TICKET_GATE : BlossomBlocks.EXIT_GATE).defaultBlockState()
+								.setValue(StationGate.FACING, in));
+						site.set(x, g + 3, z, "air");
+						site.set(ox, g + 1, oz, Site.facing("stone_brick_stairs", in));
+						site.clearAbove(ox, g + 1, oz);
+						// the sign hangs on the concourse side of the beam
+						site.sign(ox, g + 4, oz, out, true, "", along == Settlement.ENTRY_ALONG ? "MASUK" : "KELUAR",
+								along == Settlement.ENTRY_ALONG ? "karcis: 1 besi" : "", along == Settlement.ENTRY_ALONG ? "klik palang" : "");
+					} else {
+						// the checker's desk: a counter, then glass up to the beam
+						site.set(x, g + 1, z, "dark_oak_planks");
+						site.set(x, g + 2, z, "dark_oak_planks");
+						site.set(x, g + 3, z, "glass_pane");
 					}
-					int sx = x0 + dx * (along + 1) + ax * side * (fence + 1);
-					int sz = z0 + dz * (along + 1) + az * side * (fence + 1);
-					site.set(sx, g + 1, sz, "dark_oak_fence");
-					site.sign(sx, g + 2, sz, in.getOpposite(), false, "", along == Settlement.ENTRY_ALONG ? "MASUK" : "KELUAR",
-							along == Settlement.ENTRY_ALONG ? "karcis: 1 besi" : "", "");
 					continue;
 				}
-				site.set(x, g + 1, z, "spruce_fence");
+				platformRailing(site, x, g, z, Math.floorMod(along, 6) == 0 || along == NusantaraNetwork.PLATFORM_START - 1 || along == NusantaraNetwork.PLATFORM_END + 1);
 			}
 			// across both ends of the platform
 			for (int k = inner; k < fence; k++) {
 				for (int along : new int[] {NusantaraNetwork.PLATFORM_START - 1, NusantaraNetwork.PLATFORM_END + 1}) {
-					site.set(x0 + dx * along + ax * side * k, g + 1, z0 + dz * along + az * side * k, "spruce_fence");
+					platformRailing(site, x0 + dx * along + ax * side * k, g, z0 + dz * along + az * side * k, false);
 				}
 			}
 		}
@@ -474,6 +610,19 @@ public final class StationBuilder {
 		for (int k = -inner + 1; k < inner; k++) {
 			site.set(x0 + dx * w + ax * k, g, z0 + dz * w + az * k, "spruce_planks");
 		}
+		StationGrounds.concourse(site, s, port, g);
+	}
+
+	// one block of the platform railing: iron bars two high, or a concrete post with a cap
+	private static void platformRailing(Site site, int x, int g, int z, boolean post) {
+		if (post) {
+			site.set(x, g + 1, z, "light_gray_concrete");
+			site.set(x, g + 2, z, "light_gray_concrete");
+			site.set(x, g + 3, z, Site.block("smooth_stone_slab").setValue(BlockStateProperties.SLAB_TYPE, SlabType.BOTTOM));
+			return;
+		}
+		site.set(x, g + 1, z, "iron_bars");
+		site.set(x, g + 2, z, "iron_bars");
 	}
 
 	private static void staff(Site site, Settlement s, int x0, int z0, int g, RandomSource random) {
@@ -497,20 +646,39 @@ public final class StationBuilder {
 			for (int x = site.box.minX(); x <= site.box.maxX(); x++) {
 				for (int z = site.box.minZ(); z <= site.box.maxZ(); z++) {
 					double distance = Settlement.distanceToSegment(x + 0.5, z + 0.5, road);
-					if (distance > 14 || !site.has(x, z)) {
+					if (distance > 14 || !site.has(x, z) || !nearestRoad(s, road, x, z, distance)) {
 						continue;
 					}
+					// the road's height at the nearest point along it. road ends are block coordinates, so a block's way
+					// along is measured from the block itself: from its centre, the first blocks of a leg after a bend
+					// shared a height and the next stood two up
+					double t = Mth.clamp(((x - road[0]) * dx + (z - road[1]) * dz) / length2, 0, 1);
+					int target = profile[Math.min(profile.length - 1, (int) Math.round(t * Math.sqrt(length2)))];
+					// a step up to the next block of road is a stair, so the way climbs and drops as a stairway people
+					// and players alike walk up without jumping
+					int i = Math.min(profile.length - 1, (int) Math.round(t * Math.sqrt(length2)));
+					BlockState up = null;
+					if (i + 1 < profile.length && profile[i + 1] == target + 1) {
+						up = step(dx, dz);
+					} else if (i > 0 && profile[i - 1] == target + 1) {
+						up = step(-dx, -dz);
+					}
 					// across the station yard the land is already flat and built on: the road is just a path over it
-					// (grading it there dug the ground out from under the hall)
+					// (grading it there dug the ground out from under the hall). its last column still gets the first
+					// stair where the road climbs straight out of the gate, or the first riser is a two-block wall
 					if (yard(s, x, z) <= 0) {
-						if (distance <= 1.8 && site.get(x, s.node.ground(), z).is(Blocks.GRASS_BLOCK)) {
-							site.set(x, s.node.ground(), z, "dirt_path");
+						int g = s.node.ground();
+						if (distance <= 1.8 && site.get(x, g, z).is(Blocks.GRASS_BLOCK)) {
+							site.set(x, g, z, "dirt_path");
+						}
+						// (the plan can already be a block up here: the yard stays flat whatever it says)
+						int ahead = profile[Math.min(profile.length - 1, i + 1)];
+						int behind = profile[Math.max(0, i - 1)];
+						if (distance <= 1.8 && Math.max(Math.max(ahead, behind), target) == g + 1 && site.get(x, g + 1, z).isAir()) {
+							site.set(x, g + 1, z, ahead >= behind ? step(dx, dz) : step(-dx, -dz));
 						}
 						continue;
 					}
-					// the road's height at the nearest point along it
-					double t = Mth.clamp(((x + 0.5 - road[0]) * dx + (z + 0.5 - road[1]) * dz) / length2, 0, 1);
-					int target = profile[(int) Math.round(t * (profile.length - 1))];
 					int natural = site.ground(x, z, false);
 					boolean railAbove = railAt(site, x, target + 1, z);
 					boolean railHere = railAt(site, x, target, z);
@@ -523,8 +691,19 @@ public final class StationBuilder {
 						}
 						continue;
 					}
+					// where the road would cut more than a few blocks into a hill it goes through it in a lined
+					// tunnel instead, the hill left standing over it
+					if (natural - target >= TUNNEL_DEPTH) {
+						tunnelColumn(site, x, target, z, distance, Math.floorMod((int) Math.round(t * Math.sqrt(length2)), 8) == 0, up);
+						continue;
+					}
 					if (distance <= 1.8) {
 						roadColumn(site, x, target, z, true, natural);
+						// (on a plank bridge too: the road often steps up off the bridge into a kampung's gate)
+						BlockState under = site.get(x, target, z);
+						if (up != null && (site.get(x, target + 1, z).isAir() || Site.isCover(site.get(x, target + 1, z))) && (terrain(under) || under.is(BlockTags.PLANKS))) {
+							site.set(x, target + 1, z, up);
+						}
 					} else {
 						// banks either side, sloping from the road back to the land
 						double bankWidth = Mth.clamp(Math.abs(natural - target), 2, 12);
@@ -549,12 +728,110 @@ public final class StationBuilder {
 			}
 		}
 	}
+	// after every road is laid: where one block of road along a road is one higher than the next (two roads meeting
+	// at a kampung gate at different heights, a road joining a yard), the lower block gets the stair up to it
+	public static void stairs(Site site, Settlement s) {
+		for (int x = site.box.minX(); x <= site.box.maxX(); x++) {
+			for (int z = site.box.minZ(); z <= site.box.maxZ(); z++) {
+				int[] road = onRoad(s, x, z);
+				if (road == null || yard(s, x, z) <= 0) {
+					continue;
+				}
+				int y = surface(site, x, z);
+				if (!roadSurface(site.get(x, y, z)) || !site.get(x, y + 1, z).isAir() || !site.get(x, y + 2, z).isAir()) {
+					continue;
+				}
+				double rx = road[2] - road[0];
+				double rz = road[3] - road[1];
+				double rl = Math.hypot(rx, rz);
+				for (Direction d : Direction.Plane.HORIZONTAL) {
+					int nx = x + d.getStepX();
+					int nz = z + d.getStepZ();
+					// along the road only: across it are its banks
+					if (!site.has(nx, nz) || Math.abs(d.getStepX() * rx + d.getStepZ() * rz) / rl < 0.5 || onRoad(s, nx, nz) == null) {
+						continue;
+					}
+					int ny = surface(site, nx, nz);
+					BlockState top = site.get(nx, ny, nz);
+					// any solid ground with room to stand over it (a kampung's gate floor is whatever its builder laid), or
+					// a block one up that starts its own flight of stairs
+					BlockPos over = new BlockPos(nx, ny + 1, nz);
+					boolean room = site.get(nx, ny + 1, nz).getCollisionShape(site.level, over).isEmpty() && site.get(nx, ny + 2, nz).getCollisionShape(site.level, over.above()).isEmpty();
+					// (a path block is not a full block, but it is ground all the same)
+					boolean ground = ny == y + 1 && !(top.getBlock() instanceof StairBlock) && (top.isSolidRender() || roadSurface(top));
+					boolean flight = ny == y + 2 && top.getBlock() instanceof StairBlock && site.get(nx, ny - 1, nz).isSolidRender();
+					if ((ground || flight) && room) {
+						site.set(x, y + 1, z, Site.facing("stone_brick_stairs", d));
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	// the highest solid block of a column, scanning down from a little over the worldgen heightmap: that heightmap
+	// isn't kept up during generation, so it misses a road or a kampung path laid a block or two over the old ground
+	private static int surface(Site site, int x, int z) {
+		int y = site.ground(x, z, false) + 8;
+		while (y > site.level.getMinY()) {
+			BlockState state = site.get(x, y, z);
+			if (!state.isAir() && (!Site.isCover(state) || !state.getFluidState().isEmpty())) {
+				return y;
+			}
+			y--;
+		}
+		return y;
+	}
+
+	private static boolean roadSurface(BlockState state) {
+		return state.is(Blocks.DIRT_PATH) || state.is(BlockTags.PLANKS);
+	}
+
+	// the road a column is on (within its paved width), or null
+	private static int[] onRoad(Settlement s, int x, int z) {
+		for (int[] road : s.roads()) {
+			if (Settlement.distanceToSegment(x + 0.5, z + 0.5, road) <= 1.8) {
+				return road;
+			}
+		}
+		return null;
+	}
+
+
+	// the stair of a road climbing towards (ux, uz): straight along a road that runs close to an axis, and on a
+	// diagonal one an outer corner whose high quarter points up the diagonal. a walker crosses a diagonal road block
+	// by block from either side, and a straight stair turned the other way met them with its high half
+	private static BlockState step(double ux, double uz) {
+		Direction xDir = ux >= 0 ? Direction.EAST : Direction.WEST;
+		Direction zDir = uz >= 0 ? Direction.SOUTH : Direction.NORTH;
+		double ax = Math.abs(ux);
+		double az = Math.abs(uz);
+		if (ax > az * 2) {
+			return Site.facing("stone_brick_stairs", xDir);
+		}
+		if (az > ax * 2) {
+			return Site.facing("stone_brick_stairs", zDir);
+		}
+		StairsShape shape = xDir.getCounterClockWise() == zDir ? StairsShape.OUTER_LEFT : StairsShape.OUTER_RIGHT;
+		return Site.facing("stone_brick_stairs", xDir).setValue(StairBlock.SHAPE, shape);
+	}
+
+	// whether `road` is the nearest of the settlement's roads to a column: only that one grades it, so the banks or
+	// the tunnel of a road passing nearby never re-level another road (it dropped the way two blocks in one step)
+	private static boolean nearestRoad(Settlement s, int[] road, int x, int z, double distance) {
+		for (int[] other : s.roads()) {
+			if (other != road && Settlement.distanceToSegment(x + 0.5, z + 0.5, other) < distance) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 	// a corridor clear of trees over the road, so it shows from afar
 	private static void clearCanopy(Site site, int x, int target, int z) {
 		for (int y = target + 1; y <= target + 18; y++) {
 			BlockState state = site.get(x, y, z);
-			if (state.is(BlockTags.LEAVES) || state.is(BlockTags.LOGS) || state.is(Blocks.VINE)) {
+			if (!Site.planted(state) && (state.is(BlockTags.LEAVES) || state.is(BlockTags.LOGS) || state.is(Blocks.VINE))) {
 				site.set(x, y, z, Blocks.AIR.defaultBlockState());
 			}
 		}
@@ -575,9 +852,33 @@ public final class StationBuilder {
 					if (site.has(x, z) || !around.has(x, z) || Settlement.distanceToSegment(x + 0.5, z + 0.5, road) > 4.5) {
 						continue;
 					}
-					double t = Mth.clamp(((x + 0.5 - road[0]) * dx + (z + 0.5 - road[1]) * dz) / length2, 0, 1);
-					clearCanopy(around, x, profile[(int) Math.round(t * (profile.length - 1))], z);
+					double t = Mth.clamp(((x - road[0]) * dx + (z - road[1]) * dz) / length2, 0, 1);
+					clearCanopy(around, x, profile[Math.min(profile.length - 1, (int) Math.round(t * Math.sqrt(length2)))], z);
 				}
+			}
+		}
+	}
+
+	// a road tunnel: paved floor with stone stairs where it climbs (`up`, or null on the level), stone brick walls and
+	// roof, a lantern every 8 blocks. the roof stands six over the floor: on a climb each block carries a stair, so
+	// the way is a block over the floor, and on a diagonal the next block can be two lower, its roof otherwise in the
+	// face of whoever steps down into it
+	private static void tunnelColumn(Site site, int x, int y, int z, double distance, boolean lamp, BlockState up) {
+		if (distance <= 1.8) {
+			site.set(x, y, z, "polished_andesite");
+			for (int k = y + 1; k <= y + 5; k++) {
+				site.set(x, k, z, "air");
+			}
+			if (up != null) {
+				site.set(x, y + 1, z, up);
+			}
+			site.set(x, y + 6, z, "stone_bricks");
+			if (lamp && distance <= 0.8) {
+				site.set(x, y + 5, z, Site.block("lantern").setValue(BlockStateProperties.HANGING, true));
+			}
+		} else if (distance <= 2.8) {
+			for (int k = y; k <= y + 6; k++) {
+				site.set(x, k, z, "stone_bricks");
 			}
 		}
 	}
@@ -593,11 +894,13 @@ public final class StationBuilder {
 			site.clearAbove(x, y, z);
 			return;
 		}
-		if (!terrain(base)) {
+		if (!terrain(base) && !Site.isNatural(base)) {
 			return;
 		}
+		// grass tufts and flowers on the old ground are built over, and ore is just ground; anything else (a fence, a
+		// wall) is left alone (an ore block used to leave a one-block pit in the road)
 		BlockState current = site.get(x, y, z);
-		if (!terrain(current) && !current.isAir() && !current.is(BlockTags.SUBSTRATE_OVERWORLD)) {
+		if (!terrain(current) && !Site.isNatural(current) && !current.isAir() && !current.is(BlockTags.SUBSTRATE_OVERWORLD) && !Site.isCover(current)) {
 			return;
 		}
 		site.level(x, y, z, path ? "dirt_path" : "grass_block");

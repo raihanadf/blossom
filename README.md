@@ -10,6 +10,8 @@ cook together, pet tiny critters, ride a motor through the kampung and play a ro
 
 <img src="assets/showcase.png" alt="blossom in game">
 
+<img src="assets/train.gif" alt="a train crossing a viaduct in the hills">
+
 <sub>minecraft 26.3 · fabric · needs fabric api and geckolib</sub>
 
 </div>

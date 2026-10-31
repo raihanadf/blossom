@@ -308,7 +308,9 @@ public class Warga extends PathfinderMob {
 	// are the way over)
 	private static boolean onTrack(BlockGetter level, BlockPos pos) {
 		BlockState below = level.getBlockState(pos.below());
-		if (below.is(BlockTags.PLANKS) || !(below.is(Blocks.GRAVEL) || level.getBlockState(pos).is(BlossomBlocks.TRACK))) {
+		// on a climb the ballast is a layer the walker stands in, or on
+		boolean ballast = below.is(Blocks.GRAVEL) || below.is(BlossomBlocks.BALLAST) || level.getBlockState(pos).is(BlossomBlocks.BALLAST);
+		if (below.is(BlockTags.PLANKS) || !(ballast || level.getBlockState(pos).is(BlossomBlocks.TRACK))) {
 			return false;
 		}
 		for (BlockPos near : BlockPos.betweenClosed(pos.offset(-2, 0, -2), pos.offset(2, 0, 2))) {

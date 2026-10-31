@@ -12,6 +12,7 @@ import static com.raihanadf.blossom.registry.BlossomBlocks.RICE;
 import static com.raihanadf.blossom.registry.BlossomBlocks.RICE_CROP;
 import static com.raihanadf.blossom.registry.BlossomBlocks.TABLES;
 import static com.raihanadf.blossom.registry.BlossomBlocks.WOODS;
+import static com.raihanadf.blossom.registry.BlossomBlocks.BALLAST;
 import static com.raihanadf.blossom.registry.BlossomBlocks.TRACK;
 import static com.raihanadf.blossom.registry.BlossomItems.APPLE_PORRIDGE;
 import static com.raihanadf.blossom.registry.BlossomItems.BATON;
@@ -43,6 +44,7 @@ import static com.raihanadf.blossom.registry.BlossomItems.TICKET;
 import static com.raihanadf.blossom.registry.BlossomItems.TRACK_PIECE;
 import com.google.gson.JsonObject;
 import com.raihanadf.blossom.Blossom;
+import com.raihanadf.blossom.nusantara.StationGate;
 import com.raihanadf.blossom.furniture.LampBlock;
 import com.raihanadf.blossom.registry.BlossomEntities;
 import java.util.List;
@@ -111,7 +113,9 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 				blocks.registerSimpleItemModel(SPORTS_NET, net);
 				for (Block gate : List.of(TICKET_GATE, EXIT_GATE)) {
 					Identifier model = Blossom.id("block/" + name(gate));
-					blocks.blockStateOutput.accept(MultiVariantGenerator.dispatch(gate, BlockModelGenerators.plainVariant(model))
+					// the arm drawn down (closed) or swung up (open)
+					blocks.blockStateOutput.accept(MultiVariantGenerator.dispatch(gate)
+							.with(BlockModelGenerators.createBooleanModelDispatch(StationGate.OPEN, BlockModelGenerators.plainVariant(Blossom.id("block/" + name(gate) + "_open")), BlockModelGenerators.plainVariant(model)))
 							.with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING));
 					blocks.registerSimpleItemModel(gate, model);
 				}
@@ -196,7 +200,7 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 					if (block == RICE_CROP) {
 						continue;
 					}
-					builder(block == COOKING_POT ? BlockTags.MINEABLE_WITH_PICKAXE : BlockTags.MINEABLE_WITH_AXE).add(block.builtInRegistryHolder().key());
+					builder(block == COOKING_POT ? BlockTags.MINEABLE_WITH_PICKAXE : block == BALLAST ? BlockTags.MINEABLE_WITH_SHOVEL : BlockTags.MINEABLE_WITH_AXE).add(block.builtInRegistryHolder().key());
 				}
 			}
 		});
@@ -323,6 +327,7 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 				builder.add(COOKING_POT, "Cooking Pot");
 				builder.add(LAMP, "Lamp");
 				builder.add(TRACK, "Track");
+				builder.add(BALLAST, "Ballast");
 				builder.add(TRACK_PIECE, "Track Piece");
 				for (String wood : WOODS) {
 					String name = titleCase(wood);
@@ -383,6 +388,9 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 				builder.add(TICKET, "Train Ticket");
 				builder.add(TICKET_GATE, "Ticket Gate");
 				builder.add(EXIT_GATE, "Exit Gate");
+				builder.add("message.blossom.gate.need", "You need a ticket: hold an iron ingot and click the gate");
+				builder.add("message.blossom.gate.go", "You have a ticket, walk on through");
+				builder.add("message.blossom.gate.bought", "One ticket, walk on through");
 				builder.add("message.blossom.gate.welcome", "Ticket checked, have a good trip!");
 				builder.add("message.blossom.ticket.sold", "One ticket, here you are. Have a good trip!");
 				builder.add("message.blossom.ticket.price", "A ticket is one iron ingot");
@@ -408,6 +416,7 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 				builder.add(COOKING_POT, "Panci Masak");
 				builder.add(LAMP, "Lampu");
 				builder.add(TRACK, "Rel");
+				builder.add(BALLAST, "Batu Balas");
 				builder.add(TRACK_PIECE, "Potongan Rel");
 				for (String wood : WOODS) {
 					builder.add(CHAIRS.get(wood), "Kursi " + WOOD_ID.get(wood));
@@ -467,6 +476,9 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 				builder.add(TICKET, "Karcis Kereta");
 				builder.add(TICKET_GATE, "Pintu Masuk Peron");
 				builder.add(EXIT_GATE, "Pintu Keluar Peron");
+				builder.add("message.blossom.gate.need", "Butuh karcis: pegang besi lalu klik palangnya");
+				builder.add("message.blossom.gate.go", "Karcis sudah ada, silakan lewat");
+				builder.add("message.blossom.gate.bought", "Satu karcis, silakan lewat");
 				builder.add("message.blossom.gate.welcome", "Karcis sudah dicek, selamat jalan!");
 				builder.add("message.blossom.ticket.sold", "Satu karcis, ini dia. Selamat jalan!");
 				builder.add("message.blossom.ticket.price", "Karcisnya satu batang besi");

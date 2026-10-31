@@ -9,6 +9,7 @@ import com.raihanadf.blossom.cooking.RiceCropBlock;
 import com.raihanadf.blossom.furniture.LampBlock;
 import com.raihanadf.blossom.furniture.SeatBlock;
 import com.raihanadf.blossom.furniture.ShapedBlock;
+import com.raihanadf.blossom.nusantara.BallastBlock;
 import com.raihanadf.blossom.nusantara.StationGate;
 import com.raihanadf.blossom.nusantara.TrackBlock;
 import com.raihanadf.blossom.nusantara.TrackBlockEntity;
@@ -62,6 +63,9 @@ public final class BlossomBlocks {
 	public static final Block SPORTS_NET = register("sports_net", NetBlock::new, BlockBehaviour.Properties.of()
 			.mapColor(MapColor.WOOL).strength(0.3f).sound(SoundType.WOOL).noOcclusion());
 
+	// ballast in eighths of a block, laid where a line climbs so the ballast keeps up with the track's even grade
+	public static final Block BALLAST = register("ballast", BallastBlock::new, BlockBehaviour.Properties.of()
+			.mapColor(MapColor.STONE).strength(0.6f).sound(SoundType.GRAVEL));
 	public static final Block TRACK = register("track", TrackBlock::new, BlockBehaviour.Properties.of()
 			.mapColor(MapColor.METAL).strength(0.7f).sound(SoundType.METAL).noCollision().noOcclusion());
 	// the gates in the station fence: in with a karcis, out for anyone

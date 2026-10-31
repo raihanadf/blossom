@@ -1,6 +1,7 @@
 {
   "block.blossom.acacia_chair": "Kursi Akasia",
   "block.blossom.acacia_table": "Meja Akasia",
+  "block.blossom.ballast": "Batu Balas",
   "block.blossom.bamboo_chair": "Kursi Bambu",
   "block.blossom.bamboo_table": "Meja Bambu",
   "block.blossom.birch_chair": "Kursi Birk",
@@ -86,6 +87,9 @@
   "itemGroup.blossom": "Blossom",
   "key.blossom.inspect": "Periksa Pentungan",
   "key.categories.blossom": "Blossom",
+  "message.blossom.gate.bought": "Satu karcis, silakan lewat",
+  "message.blossom.gate.go": "Karcis sudah ada, silakan lewat",
+  "message.blossom.gate.need": "Butuh karcis: pegang besi lalu klik palangnya",
   "message.blossom.gate.welcome": "Karcis sudah dicek, selamat jalan!",
   "message.blossom.goal": "GOOOL!",
   "message.blossom.goal_by": "GOOOL! %s mencetak gol!",

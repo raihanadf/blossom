@@ -1,6 +1,7 @@
 {
   "block.blossom.acacia_chair": "Acacia Chair",
   "block.blossom.acacia_table": "Acacia Table",
+  "block.blossom.ballast": "Ballast",
   "block.blossom.bamboo_chair": "Bamboo Chair",
   "block.blossom.bamboo_table": "Bamboo Table",
   "block.blossom.birch_chair": "Birch Chair",
@@ -86,6 +87,9 @@
   "itemGroup.blossom": "Blossom",
   "key.blossom.inspect": "Inspect Baton",
   "key.categories.blossom": "Blossom",
+  "message.blossom.gate.bought": "One ticket, walk on through",
+  "message.blossom.gate.go": "You have a ticket, walk on through",
+  "message.blossom.gate.need": "You need a ticket: hold an iron ingot and click the gate",
   "message.blossom.gate.welcome": "Ticket checked, have a good trip!",
   "message.blossom.goal": "GOOOAL!",
   "message.blossom.goal_by": "GOOOAL! %s scores!",

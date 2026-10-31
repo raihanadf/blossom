@@ -32,6 +32,8 @@ public class NusantaraNetwork {
 	private static final double SIDING_RAMP = 10;
 	private static final double SIDING_SPACING = 4;
 	public static final int TRACK_START = 7;
+	// how far either side of a step in the bed the even grade ramps
+	private static final double RAMP = 6;
 	public static final int PLATFORM_START = 12;
 	public static final int PLATFORM_END = 78;
 	// directions of the four ports of a station: east, south, west, north
@@ -222,6 +224,8 @@ public class NusantaraNetwork {
 		public final double[] txs;
 		public final double[] tzs;
 		private int[] bed;
+		// the bed as an even grade (see `grade`): where the track and the top of the ballast lie
+		private double[] even;
 		private Mode[] modes;
 		public final int minX;
 		public final int minZ;
@@ -433,19 +437,13 @@ public class NusantaraNetwork {
 			return modes[Mth.clamp(i, 0, modes.length - 1)];
 		}
 
-		// smooth height of the bed at any distance along (for trains)
-		// the top of the ballast as the track sees it: half a block up where the line is about to climb a step (a slab
-		// lies there), so the track ramps smoothly over two blocks instead of jumping one
+		// the height of the bed at any distance along, on its even grade: the top of the ballast is one block over it.
+		// the track, the trains and the lori all ride on this
 		public double bedAt(double s) {
 			profile();
-			int i = Mth.clamp(Mth.floor(s), 0, bed.length - 2);
+			int i = Mth.clamp(Mth.floor(s), 0, even.length - 2);
 			double f = Mth.clamp(s - i, 0, 1);
-			return Mth.lerp(f, bed[i] + (slab(i) ? 0.5 : 0), bed[i + 1] + (slab(i + 1) ? 0.5 : 0));
-		}
-
-		public boolean slab(int i) {
-			profile();
-			return (i > 0 && bed[i - 1] > bed[i]) || (i + 1 < bed.length && bed[i + 1] > bed[i]);
+			return Mth.lerp(f, even[i], even[i + 1]);
 		}
 
 		// the height profile: level through both stations, then following the land at a gentle grade, raised over
@@ -634,7 +632,52 @@ public class NusantaraNetwork {
 				fine[i] = cm[Math.min(coarse - 1, (i + step / 2) / step)];
 			}
 			modes = fine;
+			even = grade(beds);
 			bed = beds;
+		}
+
+		// a real line climbs at an even grade, not in steps: between the middles of two level stretches of the bed the
+		// height ramps straight from one to the other, over at most 6 blocks either side of the step, so long level
+		// stretches (the stations) stay level right up to it
+		private static double[] grade(int[] beds) {
+			int n = beds.length;
+			double[] out = new double[n];
+			int a = 0;
+			while (a < n) {
+				int e = a;
+				while (e + 1 < n && beds[e + 1] == beds[a]) {
+					e++;
+				}
+				double c = (a + e) / 2.0;
+				for (int i = a; i <= e; i++) {
+					out[i] = beds[a];
+					if (i >= c && e + 1 < n) {
+						// towards the next stretch
+						int b = e + 1;
+						while (b + 1 < n && beds[b + 1] == beds[e + 1]) {
+							b++;
+						}
+						double lo = Math.max(c, e + 0.5 - RAMP);
+						double hi = Math.min((e + 1 + b) / 2.0, e + 0.5 + RAMP);
+						if (i >= lo) {
+							out[i] = Mth.lerp((i - lo) / (hi - lo), beds[a], beds[e + 1]);
+						}
+					} else if (i < c && a > 0) {
+						// coming off the stretch before
+						int b = a - 1;
+						while (b - 1 >= 0 && beds[b - 1] == beds[a - 1]) {
+							b--;
+						}
+						double lo = Math.max((b + a - 1) / 2.0, a - 0.5 - RAMP);
+						double hi = Math.min(c, a - 0.5 + RAMP);
+						if (i <= hi) {
+							out[i] = Mth.lerp((i - lo) / (hi - lo), beds[a - 1], beds[a]);
+						}
+					}
+				}
+				a = e + 1;
+			}
+			return out;
 		}
 
 

@@ -8,12 +8,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.SlabType;
 
 // lays one line through one chunk. each column takes its place across the line from the nearest point of the line:
 // ballast and rails in the middle, a grassy shoulder, the road on one side, then slopes back to the land. how it is
@@ -108,7 +108,9 @@ public final class TrackBuilder {
 		int last = Math.min(edge.length() - 1, to + 3);
 		int changed = 0;
 		Set<Long> done = new HashSet<>();
-		for (int i = Math.max(0, from); i <= Math.min(edge.length() - 1, to); i++) {
+		// the bed is rebuilt over the same stretch the rails are laid again on, so no track is ever laid where the deck
+		// under it is still missing
+		for (int i = Math.max(0, from - 1); i <= Math.min(edge.length() - 1, to + 1); i++) {
 			int reach = edge.ballast(i) + 4;
 			for (double a = -reach; a <= reach; a += 0.5) {
 				int x = Mth.floor(edge.xs[i] - edge.tzs[i] * a);
@@ -129,14 +131,20 @@ public final class TrackBuilder {
 				int before = fingerprint(site, x, y, z);
 				column(site, edge, x, z, c);
 				// the space the trains run through: nothing but rails and air within reach of a track (the parapet
-				// of a bridge or the wall of a tunnel at the edge of the bed stays)
+				// of a bridge or the wall of a tunnel at the edge of the bed stays). it starts over the ballast as laid:
+				// on a climb the gravel and the ballast layer sit on the even grade, above the stepped bed, and clearing
+				// from the bed planned air over them, so the crew took our own ballast for damage
+				int top = y;
+				while (site.get(x, top + 1, z).is(Blocks.GRAVEL) || site.get(x, top + 1, z).is(BlossomBlocks.BALLAST)) {
+					top++;
+				}
 				for (int lane = 0; lane < edge.lanes().length && Math.abs(c.across()) < edgeAt - 0.5; lane++) {
 					if (!edge.laid(lane, c.sample()) || Math.abs(c.across() - edge.laneOffset(lane, c.sample())) > 1.6) {
 						continue;
 					}
-					for (int k = y + 1; k <= y + 4; k++) {
+					for (int k = top + 1; k <= top + 4; k++) {
 						BlockState state = site.get(x, k, z);
-						if (!state.isAir() && !state.is(BlossomBlocks.TRACK) && !state.is(BlockTags.SLABS)) {
+						if (!state.isAir() && !state.is(BlossomBlocks.TRACK) && !state.is(BlossomBlocks.BALLAST)) {
 							site.set(x, k, z, Blocks.AIR.defaultBlockState());
 						}
 					}
@@ -190,6 +198,18 @@ public final class TrackBuilder {
 		double ad = Math.abs(c.across());
 		int y = edge.bed(c.sample());
 		Mode mode = edge.mode(c.sample());
+		// the ballast follows the line's even grade: whole gravel blocks up to it, then a layer of ballast for the
+		// eighths of a block left over, so it climbs with the track instead of in steps
+		int layers = 0;
+		if (ad <= bh + 0.5) {
+			double even = edge.bedAt(c.along());
+			y = Mth.floor(even);
+			layers = (int) Math.round((even - y) * 8);
+			if (layers == 8) {
+				y++;
+				layers = 0;
+			}
+		}
 		// the ballast, then one block of shoulder: the railing of a bridge stands there. tunnels are bored wider, the
 		// cars swing out on curves and riders lean out of the windows
 		int edgeAt = mode == Mode.TUNNEL ? bh + 3 : bh + 1;
@@ -201,7 +221,6 @@ public final class TrackBuilder {
 		boolean wall = ad > edgeAt - 0.5 && ad <= edgeAt + 0.5;
 		boolean inside = ad <= edgeAt + 0.5;
 		String top = ad <= bh + 0.5 ? "gravel" : "grass_block";
-		boolean step = ad <= bh + 0.5 && edge.slab(c.sample());
 		// the first two blocks of a tunnel are its portal: a stone face up to the hillside, no loose land hanging over
 		boolean portal = mode == Mode.TUNNEL && (edge.mode(Math.max(0, c.sample() - 2)) != Mode.TUNNEL || edge.mode(Math.min(edge.length() - 1, c.sample() + 2)) != Mode.TUNNEL);
 		if (portal && !inside && ad <= edgeAt + 3.5) {
@@ -223,8 +242,8 @@ public final class TrackBuilder {
 				}
 				if (inside) {
 					site.level(x, y, z, top);
-					if (step) {
-						site.set(x, y + 1, z, ballastSlab());
+					if (layers > 0) {
+						site.set(x, y + 1, z, ballastLayer(layers));
 					}
 				} else {
 					// telegraph poles on one side, where the land beside the line is about level with it
@@ -235,12 +254,32 @@ public final class TrackBuilder {
 						}
 						return;
 					}
-					// cutting or embankment slope back to the land; water stays (the dike holds it)
+					// cutting or embankment slope back to the land; water stays (the dike holds it), and a slope never
+					// runs out into a lake or a river: built up from the bottom it stood out of the water as a pillar of
+					// dirt (worst when a crew rebuilt a few blocks of it after an explosion)
 					if (!site.get(x, y + 1, z).getFluidState().isEmpty()) {
 						return;
 					}
 					int k = (int) Math.round(ad - edgeAt);
 					int ground = site.ground(x, z, false);
+					if (!site.get(x, ground, z).getFluidState().isEmpty()) {
+						// along the water's edge a stone revetment instead, from the bottom up to the land beside it,
+						// so the bank facing the water is a neat face rather than a sheer cut of dirt
+						// (only right by the line: a lake shore further out is the land's own)
+						int rim = Integer.MIN_VALUE;
+						if (k <= 3) {
+							for (Direction d : Direction.Plane.HORIZONTAL) {
+								int near = site.ground(x + d.getStepX(), z + d.getStepZ(), false);
+								if (site.get(x + d.getStepX(), near, z + d.getStepZ()).getFluidState().isEmpty()) {
+									rim = Math.max(rim, Math.min(near, y));
+								}
+							}
+						}
+						for (int r = site.ground(x, z, true) + 1; r <= rim; r++) {
+							site.set(x, r, z, edge.lining);
+						}
+						return;
+					}
 					if (ground > y + k) {
 						site.level(x, y + k, z, "grass_block");
 					} else if (ground < y - k && y - ground <= SLOPE) {
@@ -276,8 +315,8 @@ public final class TrackBuilder {
 						site.set(x, k, z, lining);
 					}
 				}
-				if (step) {
-					site.set(x, y + 1, z, ballastSlab());
+				if (layers > 0) {
+					site.set(x, y + 1, z, ballastLayer(layers));
 				}
 				if (Math.abs(ad - bh) < 0.5 && c.across() > 0 && Math.floorMod(along, 12) == 0) {
 					site.set(x, y + 6, z, Site.block("lantern").setValue(BlockStateProperties.HANGING, true));
@@ -294,8 +333,8 @@ public final class TrackBuilder {
 					site.set(x, y - 1, z, deck);
 				}
 				site.clearAbove(x, y, z);
-				if (step) {
-					site.set(x, y + 1, z, ballastSlab());
+				if (layers > 0) {
+					site.set(x, y + 1, z, ballastLayer(layers));
 				}
 				int pierEvery = steel ? 24 : 12;
 				int fromPier = Math.min(Math.floorMod(along, pierEvery), pierEvery - Math.floorMod(along, pierEvery));
@@ -350,8 +389,8 @@ public final class TrackBuilder {
 		return top;
 	}
 
-	private static BlockState ballastSlab() {
-		return Site.block("andesite_slab").setValue(BlockStateProperties.SLAB_TYPE, SlabType.BOTTOM);
+	private static BlockState ballastLayer(int layers) {
+		return BlossomBlocks.BALLAST.defaultBlockState().setValue(BallastBlock.LAYERS, layers);
 	}
 
 	private static String tubeWall(Site site, int x, int y, int z, String lining) {
@@ -422,14 +461,17 @@ public final class TrackBuilder {
 				if (!site.get(cx, by, cz).is(BlossomBlocks.TRACK)) {
 					site.set(cx, by, cz, BlossomBlocks.TRACK.defaultBlockState());
 				}
-				// a track never hangs in the air: where nothing holds it up (a gap in the yard, a dip under a tree) it gets
-				// ballast and a bank of soil under it, down to the ground
-				for (int k = by - 1; k > by - 30 && k > site.level.getMinY(); k--) {
-					BlockState under = site.get(cx, k, cz);
-					if (!Site.isCover(under) || !under.getFluidState().isEmpty()) {
-						break;
+				// a track never hangs in the air over a small gap (a dip in the yard, a hollow under a tree): it gets ballast
+				// and a little soil under it, down to the ground. a deeper drop is a bridge or an embankment, built by the
+				// bed itself; filling it here stood a tall column of dirt out of the water under a broken bridge
+				int support = by - 1;
+				while (support > by - 6 && support > site.level.getMinY() && Site.isCover(site.get(cx, support, cz)) && site.get(cx, support, cz).getFluidState().isEmpty()) {
+					support--;
+				}
+				if (support > by - 6 && site.get(cx, support, cz).getFluidState().isEmpty()) {
+					for (int k = by - 1; k > support; k--) {
+						site.set(cx, k, cz, k == by - 1 ? "gravel" : "dirt");
 					}
-					site.set(cx, k, cz, k == by - 1 ? "gravel" : "dirt");
 				}
 				// rails reach a little past their own block, so land or a slope over them and right beside them goes:
 				// nothing natural is ever left lying on the track
@@ -441,7 +483,7 @@ public final class TrackBuilder {
 						for (int k = by + (ox == 0 && oz == 0 ? 1 : 0); k <= by + 3; k++) {
 							BlockState above = site.get(cx + ox, k, cz + oz);
 							// the next block's ballast (a step up) and water (a tube under a lake) stay
-							if (Site.isNatural(above) && !above.is(Blocks.GRAVEL) && above.getFluidState().isEmpty()) {
+							if (Site.isNatural(above) && !above.is(Blocks.GRAVEL) && !above.is(BlossomBlocks.BALLAST) && above.getFluidState().isEmpty()) {
 								site.set(cx + ox, k, cz + oz, Blocks.AIR.defaultBlockState());
 							}
 						}

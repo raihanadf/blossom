@@ -156,6 +156,16 @@ public class KampungPiece extends StructurePiece {
 	}
 
 	// flat yard inside the fence, then a gentle slope back to the natural terrain around it
+	// the height of a kampung's ground `outside` blocks out from its fence once it is built: its own level inside,
+	// sloping back to `natural` over a width that grows with the height to make up
+	public static int yardLevel(float outside, int ground, int natural) {
+		if (outside > EDGE_BLEND) {
+			return natural;
+		}
+		int width = Math.min(EDGE_BLEND, Math.max(8, Math.abs(natural - ground) * 2));
+		return outside <= 0 ? ground : Math.round(Mth.lerp(Math.min(1, outside / width), ground, natural));
+	}
+
 	private void levelGround(Site site) {
 		int reach = plan.extent + EDGE_BLEND;
 		for (int x = -reach; x <= reach; x++) {
@@ -173,9 +183,7 @@ public class KampungPiece extends StructurePiece {
 				if (railway(site, x, natural, z)) {
 					continue;
 				}
-				int difference = natural - ground;
-				int width = Math.min(EDGE_BLEND, Math.max(8, Math.abs(difference) * 2));
-				int top = outside <= 0 ? ground : Math.round(Mth.lerp(Math.min(1, outside / width), ground, natural));
+				int top = yardLevel(outside, ground, natural);
 				// past the slope the land (and any water on it) is left as it is
 				if (top == natural && outside > 0) {
 					continue;

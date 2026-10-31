@@ -66,7 +66,8 @@ public final class TownCore {
 				int out = Math.max(Math.abs(x - cx), Math.abs(z - cz)) - reach;
 				if (out <= 0) {
 					site.level(x, g, z, "grass_block");
-				} else {
+				} else if (!town.nearRoad(x + 0.5, z + 0.5, 4.5)) {
+					// the bank leaves the roads (built before it) alone: they were planned on it already
 					site.blend(x, z, g, out, 30);
 				}
 			}

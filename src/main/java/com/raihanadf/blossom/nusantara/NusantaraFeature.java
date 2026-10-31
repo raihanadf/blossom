@@ -63,6 +63,9 @@ public record NusantaraFeature() implements Feature {
 					piece.postProcess(level, null, generator, random, box, chunk, new BlockPos(cluster.x(), cluster.ground(), cluster.z()));
 				}
 			}
+			// last, once the kampungs and the town square are built round them: a stair wherever the road steps up.
+			// over the chunks round this one too: the step into a kampung gate can come in a chunk built later
+			StationBuilder.stairs(around, settlement);
 		}
 		return true;
 	}

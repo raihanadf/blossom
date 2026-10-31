@@ -120,11 +120,21 @@ public class Site {
 	// trees, plants, flowers, snow and the like: things a builder clears away without a second thought (flowers and
 	// saplings aren't "replaceable", so without their tags they were taken for something built and left floating)
 	public static boolean isCover(BlockState state) {
+		if (planted(state)) {
+			return false;
+		}
 		return state.isAir() || state.canBeReplaced() || state.is(BlockTags.REPLACEABLE_BY_TREES) || state.is(BlockTags.FLOWERS)
 				|| state.is(BlockTags.SAPLINGS) || state.is(Blocks.SUGAR_CANE) || state.is(Blocks.SWEET_BERRY_BUSH) || state.is(Blocks.PUMPKIN)
 				|| state.is(Blocks.MELON) || state.is(Blocks.AZALEA) || state.is(Blocks.BIG_DRIPLEAF) || state.is(Blocks.SMALL_DRIPLEAF) || state.is(BlockTags.LOGS) || state.is(BlockTags.LEAVES) || state.is(Blocks.BAMBOO)
 				|| state.is(Blocks.MUSHROOM_STEM) || state.is(Blocks.BROWN_MUSHROOM_BLOCK) || state.is(Blocks.RED_MUSHROOM_BLOCK)
 				|| state.is(Blocks.COCOA) || state.is(Blocks.BEE_NEST) || state.is(Blocks.CACTUS) || state.is(Blocks.MOSS_CARPET);
+	}
+
+	// greenery a builder put there on purpose (station hedges and shade trees): its leaves are persistent, which
+	// natural leaves never are, and its trunks are jungle wood, which no natural tree grows. it is never cleared as
+	// wild growth
+	public static boolean planted(BlockState state) {
+		return state.is(Blocks.JUNGLE_WOOD) || state.hasProperty(BlockStateProperties.PERSISTENT) && state.getValue(BlockStateProperties.PERSISTENT);
 	}
 
 	// the highest block of real ground in a column, looking through trees and plants (and water if `throughWater`)

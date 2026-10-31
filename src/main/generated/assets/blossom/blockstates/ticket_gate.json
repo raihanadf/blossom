@@ -1,18 +1,33 @@
 {
   "variants": {
-    "facing=east": {
+    "facing=east,open=false": {
       "model": "blossom:block/ticket_gate",
       "y": 90
     },
-    "facing=north": {
+    "facing=east,open=true": {
+      "model": "blossom:block/ticket_gate_open",
+      "y": 90
+    },
+    "facing=north,open=false": {
       "model": "blossom:block/ticket_gate"
     },
-    "facing=south": {
+    "facing=north,open=true": {
+      "model": "blossom:block/ticket_gate_open"
+    },
+    "facing=south,open=false": {
       "model": "blossom:block/ticket_gate",
       "y": 180
     },
-    "facing=west": {
+    "facing=south,open=true": {
+      "model": "blossom:block/ticket_gate_open",
+      "y": 180
+    },
+    "facing=west,open=false": {
       "model": "blossom:block/ticket_gate",
+      "y": 270
+    },
+    "facing=west,open=true": {
+      "model": "blossom:block/ticket_gate_open",
       "y": 270
     }
   }
