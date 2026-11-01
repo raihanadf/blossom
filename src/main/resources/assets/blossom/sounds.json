@@ -216,5 +216,120 @@
 				"name": "blossom:entity/capybara_chew1"
 			}
 		]
+	},
+	"entity.kodok.ambient": {
+		"subtitle": "subtitles.blossom.entity.kodok.ambient",
+		"sounds": [
+			{
+				"name": "blossom:entity/kodok_ambient0"
+			},
+			{
+				"name": "blossom:entity/kodok_ambient1"
+			},
+			{
+				"name": "blossom:entity/kodok_ambient2"
+			},
+			{
+				"name": "blossom:entity/kodok_ambient3"
+			},
+			{
+				"name": "blossom:entity/kodok_ambient4"
+			}
+		]
+	},
+	"entity.kodok.hurt": {
+		"subtitle": "subtitles.blossom.entity.kodok.hurt",
+		"sounds": [
+			{
+				"name": "blossom:entity/kodok_hurt0"
+			},
+			{
+				"name": "blossom:entity/kodok_hurt1"
+			}
+		]
+	},
+	"entity.kodok.death": {
+		"subtitle": "subtitles.blossom.entity.kodok.death",
+		"sounds": [
+			{
+				"name": "blossom:entity/kodok_death"
+			}
+		]
+	},
+	"entity.kodok.step": {
+		"subtitle": "subtitles.blossom.entity.kodok.step",
+		"sounds": [
+			{
+				"name": "blossom:entity/kodok_step0"
+			},
+			{
+				"name": "blossom:entity/kodok_step1"
+			}
+		]
+	},
+	"entity.kodok.happy": {
+		"subtitle": "subtitles.blossom.entity.kodok.happy",
+		"sounds": [
+			{
+				"name": "blossom:entity/kodok_happy0"
+			},
+			{
+				"name": "blossom:entity/kodok_happy1"
+			}
+		]
+	},
+	"entity.kodok.tongue": {
+		"subtitle": "subtitles.blossom.entity.kodok.tongue",
+		"sounds": [
+			{
+				"name": "blossom:entity/kodok_tongue0"
+			},
+			{
+				"name": "blossom:entity/kodok_tongue1"
+			}
+		]
+	},
+	"entity.kodok.cast": {
+		"subtitle": "subtitles.blossom.entity.kodok.cast",
+		"sounds": [
+			{
+				"name": "blossom:entity/kodok_cast"
+			}
+		]
+	},
+	"entity.kodok.catch": {
+		"subtitle": "subtitles.blossom.entity.kodok.catch",
+		"sounds": [
+			{
+				"name": "blossom:entity/kodok_catch"
+			}
+		]
+	},
+	"music.kodok.biola": {
+		"subtitle": "subtitles.blossom.music.kodok.biola",
+		"sounds": [
+			{
+				"name": "blossom:music/kodok_biola",
+				"stream": false
+			}
+		]
+	},
+	"music.kodok.angklung": {
+		"subtitle": "subtitles.blossom.music.kodok.angklung",
+		"sounds": [
+			{
+				"name": "blossom:music/kodok_angklung",
+				"stream": false
+			}
+		]
+	},
+	"music.kodok.kendang": {
+		"subtitle": "subtitles.blossom.music.kodok.kendang",
+		"sounds": [
+			{
+				"name": "blossom:music/kodok_kendang",
+				"stream": false
+			}
+		]
 	}
 }

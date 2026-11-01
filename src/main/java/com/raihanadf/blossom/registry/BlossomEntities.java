@@ -4,6 +4,7 @@ import com.raihanadf.blossom.Blossom;
 import com.raihanadf.blossom.critters.Capybara;
 import com.raihanadf.blossom.critters.Hamster;
 import com.raihanadf.blossom.critters.Hedgehog;
+import com.raihanadf.blossom.critters.Kodok;
 import com.raihanadf.blossom.furniture.SeatEntity;
 import com.raihanadf.blossom.kampung.Satpam;
 import com.raihanadf.blossom.kampung.Warga;
@@ -41,6 +42,8 @@ public final class BlossomEntities {
 			EntityType.Builder.of(Hedgehog::new, MobCategory.CREATURE).sized(0.45f, 0.35f).clientTrackingRange(10));
 	public static final EntityType<Capybara> CAPYBARA = register("capybara",
 			EntityType.Builder.of(Capybara::new, MobCategory.CREATURE).sized(0.8f, 0.75f).clientTrackingRange(10));
+	public static final EntityType<Kodok> KODOK = register("kodok",
+			EntityType.Builder.of(Kodok::new, MobCategory.CREATURE).sized(0.55f, 0.95f).clientTrackingRange(10));
 
 	// kampung folk, they live in the villages and never despawn
 	public static final EntityType<Warga> WARGA = register("warga",
@@ -68,11 +71,13 @@ public final class BlossomEntities {
 		FabricDefaultAttributeRegistry.register(HAMSTER, Hamster.createAttributes());
 		FabricDefaultAttributeRegistry.register(HEDGEHOG, Hedgehog.createAttributes());
 		FabricDefaultAttributeRegistry.register(CAPYBARA, Capybara.createAttributes());
+		FabricDefaultAttributeRegistry.register(KODOK, Kodok.createAttributes());
 
 		SpawnPlacements.register(HAMSTER, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Animal::checkAnimalSpawnRules);
 		SpawnPlacements.register(HEDGEHOG, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Animal::checkAnimalSpawnRules);
 		// swamps and mangroves are mud, not grass, so capybaras only need solid ground
 		SpawnPlacements.register(CAPYBARA, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Mob::checkMobSpawnRules);
+		SpawnPlacements.register(KODOK, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Mob::checkMobSpawnRules);
 
 		BiomeModifications.addSpawn(BiomeSelectors.includeByKey(Biomes.PLAINS, Biomes.SUNFLOWER_PLAINS, Biomes.MEADOW, Biomes.CHERRY_GROVE),
 				MobCategory.CREATURE, HAMSTER, 8, 2, 3);
@@ -80,11 +85,14 @@ public final class BlossomEntities {
 				MobCategory.CREATURE, HEDGEHOG, 6, 1, 2);
 		BiomeModifications.addSpawn(BiomeSelectors.includeByKey(Biomes.SWAMP, Biomes.MANGROVE_SWAMP, Biomes.SPARSE_JUNGLE, Biomes.RIVER),
 				MobCategory.CREATURE, CAPYBARA, 6, 2, 4);
+		// kodok come in groups, enough for a band
+		BiomeModifications.addSpawn(BiomeSelectors.includeByKey(Biomes.SWAMP, Biomes.MANGROVE_SWAMP, Biomes.RIVER, Biomes.JUNGLE, Biomes.SPARSE_JUNGLE, Biomes.BAMBOO_JUNGLE),
+				MobCategory.CREATURE, KODOK, 8, 3, 5);
 
 		FabricDefaultAttributeRegistry.register(WARGA, Warga.createAttributes());
 		FabricDefaultAttributeRegistry.register(SATPAM, Satpam.createAttributes());
 
-		for (EntityType<?> type : new EntityType<?>[] {HAMSTER, HEDGEHOG, CAPYBARA, WARGA, SATPAM}) {
+		for (EntityType<?> type : new EntityType<?>[] {HAMSTER, HEDGEHOG, CAPYBARA, KODOK, WARGA, SATPAM}) {
 			BlossomItems.register(BuiltInRegistries.ENTITY_TYPE.getKey(type).getPath() + "_spawn_egg", SpawnEggItem::new, new Item.Properties().spawnEgg(type));
 		}
 	}

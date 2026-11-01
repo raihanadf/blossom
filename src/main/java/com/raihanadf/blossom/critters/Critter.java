@@ -80,6 +80,16 @@ public abstract class Critter extends Animal implements GeoEntity {
 		return 0.4f;
 	}
 
+	// bones of props that are only shown in some states (instruments, hats); the renderer leaves these out
+	public List<String> hiddenBones() {
+		return List.of();
+	}
+
+	// when it naps: at night for most critters
+	protected boolean sleepyTime() {
+		return level().isDarkOutside();
+	}
+
 	protected abstract SoundEvent stepSound();
 
 	protected abstract SoundEvent happySound();
@@ -100,7 +110,7 @@ public abstract class Critter extends Animal implements GeoEntity {
 		goalSelector.addGoal(1, new PanicGoal(this, 1.4));
 		// naps at night, until it gets bright or something bothers it
 		goalSelector.addGoal(2, new RestGoal(this, SLEEPING, 120, 2400, 6000,
-				critter -> critter.level().isDarkOutside() && critter.onGround() && !critter.isInWater()));
+				critter -> critter.sleepyTime() && critter.onGround() && !critter.isInWater()));
 		goalSelector.addGoal(3, new BreedGoal(this, 1.0));
 		goalSelector.addGoal(4, new TemptGoal(this, 1.1, this::isFood, false));
 		goalSelector.addGoal(5, new FollowParentGoal(this, 1.1));
@@ -154,8 +164,14 @@ public abstract class Critter extends Animal implements GeoEntity {
 		// standing around: groom, look about, yawn... never the same loop for long
 		if (getCritterPose() == AWAKE && getNavigation().isDone() && getRandom().nextInt(160) == 0) {
 			List<String> all = fidgets();
-			triggerAnim("fidget", all.get(getRandom().nextInt(all.size())));
+			String fidget = all.get(getRandom().nextInt(all.size()));
+			triggerAnim("fidget", fidget);
+			fidgeted(fidget);
 		}
+	}
+
+	// a fidget just started, for critters that make a noise with one
+	protected void fidgeted(String name) {
 	}
 
 	@Override

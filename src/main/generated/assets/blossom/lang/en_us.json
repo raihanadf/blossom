@@ -58,6 +58,7 @@
   "entity.blossom.football": "Football",
   "entity.blossom.hamster": "Hamster",
   "entity.blossom.hedgehog": "Hedgehog",
+  "entity.blossom.kodok": "Kodok",
   "entity.blossom.lori": "Inspection Trolley",
   "entity.blossom.motor": "Motor",
   "entity.blossom.satpam": "Satpam",
@@ -87,6 +88,7 @@
   "item.blossom.hamster_spawn_egg": "Hamster Spawn Egg",
   "item.blossom.hedgehog_spawn_egg": "Hedgehog Spawn Egg",
   "item.blossom.kitchen_knife": "Kitchen Knife",
+  "item.blossom.kodok_spawn_egg": "Kodok Spawn Egg",
   "item.blossom.mie_goreng": "Mie Goreng",
   "item.blossom.motor": "Motor",
   "item.blossom.nasi_goreng": "Nasi Goreng",
@@ -181,5 +183,16 @@
   "subtitles.blossom.entity.hedgehog.dig": "Hedgehog roots around",
   "subtitles.blossom.entity.hedgehog.happy": "Hedgehog squeaks happily",
   "subtitles.blossom.entity.hedgehog.hurt": "Hedgehog squeals",
-  "subtitles.blossom.entity.hedgehog.step": "Hedgehog patters"
+  "subtitles.blossom.entity.hedgehog.step": "Hedgehog patters",
+  "subtitles.blossom.entity.kodok.ambient": "Kodok croaks",
+  "subtitles.blossom.entity.kodok.cast": "Fishing line splashes",
+  "subtitles.blossom.entity.kodok.catch": "Kodok lands a fish",
+  "subtitles.blossom.entity.kodok.death": "Kodok dies",
+  "subtitles.blossom.entity.kodok.happy": "Kodok croaks happily",
+  "subtitles.blossom.entity.kodok.hurt": "Kodok squeaks",
+  "subtitles.blossom.entity.kodok.step": "Kodok patters",
+  "subtitles.blossom.entity.kodok.tongue": "Kodok flicks its tongue",
+  "subtitles.blossom.music.kodok.angklung": "Kodok shakes the angklung",
+  "subtitles.blossom.music.kodok.biola": "Kodok plays the biola",
+  "subtitles.blossom.music.kodok.kendang": "Kodok drums the kendang"
 }

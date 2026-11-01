@@ -58,6 +58,7 @@
   "entity.blossom.football": "Bola Sepak",
   "entity.blossom.hamster": "Hamster",
   "entity.blossom.hedgehog": "Landak",
+  "entity.blossom.kodok": "Kodok",
   "entity.blossom.lori": "Lori Inspeksi",
   "entity.blossom.motor": "Motor",
   "entity.blossom.satpam": "Satpam",
@@ -87,6 +88,7 @@
   "item.blossom.hamster_spawn_egg": "Telur Spawn Hamster",
   "item.blossom.hedgehog_spawn_egg": "Telur Spawn Landak",
   "item.blossom.kitchen_knife": "Pisau Dapur",
+  "item.blossom.kodok_spawn_egg": "Telur Spawn Kodok",
   "item.blossom.mie_goreng": "Mie Goreng",
   "item.blossom.motor": "Motor",
   "item.blossom.nasi_goreng": "Nasi Goreng",
@@ -181,5 +183,16 @@
   "subtitles.blossom.entity.hedgehog.dig": "Landak mengorek tanah",
   "subtitles.blossom.entity.hedgehog.happy": "Landak mencicit senang",
   "subtitles.blossom.entity.hedgehog.hurt": "Landak memekik",
-  "subtitles.blossom.entity.hedgehog.step": "Langkah landak"
+  "subtitles.blossom.entity.hedgehog.step": "Langkah landak",
+  "subtitles.blossom.entity.kodok.ambient": "Kodok berkuak",
+  "subtitles.blossom.entity.kodok.cast": "Kail tercebur",
+  "subtitles.blossom.entity.kodok.catch": "Kodok dapat ikan",
+  "subtitles.blossom.entity.kodok.death": "Kodok mati",
+  "subtitles.blossom.entity.kodok.happy": "Kodok berkuak senang",
+  "subtitles.blossom.entity.kodok.hurt": "Kodok memekik",
+  "subtitles.blossom.entity.kodok.step": "Langkah kodok",
+  "subtitles.blossom.entity.kodok.tongue": "Kodok menjulurkan lidah",
+  "subtitles.blossom.music.kodok.angklung": "Kodok menggoyang angklung",
+  "subtitles.blossom.music.kodok.biola": "Kodok main biola",
+  "subtitles.blossom.music.kodok.kendang": "Kodok menabuh kendang"
 }

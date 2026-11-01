@@ -422,10 +422,12 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 				builder.add(SOTO_SAPI, "Soto Sapi");
 				builder.add(MIE_GORENG, "Mie Goreng");
 				builder.add(NASI_GORENG, "Nasi Goreng");
-				critterNames(builder, "Hamster", "Hedgehog", "Capybara", "%s Spawn Egg");
+				critterNames(builder, "%s Spawn Egg", "Hamster", "Hedgehog", "Capybara", "Kodok");
 				subtitles(builder, "Hamster squeaks", "Hamster hurts", "Hamster dies", "Hamster patters", "Hamster munches", "Hamster chirps happily",
 						"Hedgehog snuffles", "Hedgehog squeals", "Hedgehog dies", "Hedgehog patters", "Hedgehog curls up", "Hedgehog roots around", "Hedgehog squeaks happily",
-						"Capybara hums", "Capybara huffs", "Capybara dies", "Capybara steps", "Capybara chews", "Capybara purrs");
+						"Capybara hums", "Capybara huffs", "Capybara dies", "Capybara steps", "Capybara chews", "Capybara purrs",
+						"Kodok croaks", "Kodok squeaks", "Kodok dies", "Kodok patters", "Kodok croaks happily", "Kodok flicks its tongue", "Fishing line splashes",
+						"Kodok lands a fish", "Kodok plays the biola", "Kodok shakes the angklung", "Kodok drums the kendang");
 				playNames(builder, "Pet Treat", "Motor", "Football", "Racket", "Shuttlecock", "Goal Net", "Badminton Net",
 						"GOOOAL!", "GOOOAL! %s scores!", "Rally: %s hits", "Rally over at %s hits");
 				wargaNames(builder, "Villager", "Baton", "Villager Spawn Egg", "Here, try some %s!",
@@ -523,10 +525,12 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 				builder.add(SOTO_SAPI, "Soto Sapi");
 				builder.add(MIE_GORENG, "Mie Goreng");
 				builder.add(NASI_GORENG, "Nasi Goreng");
-				critterNames(builder, "Hamster", "Landak", "Kapibara", "Telur Spawn %s");
+				critterNames(builder, "Telur Spawn %s", "Hamster", "Landak", "Kapibara", "Kodok");
 				subtitles(builder, "Hamster mencicit", "Hamster kesakitan", "Hamster mati", "Langkah hamster", "Hamster mengunyah", "Hamster mencicit senang",
 						"Landak mengendus", "Landak memekik", "Landak mati", "Langkah landak", "Landak menggulung", "Landak mengorek tanah", "Landak mencicit senang",
-						"Kapibara bergumam", "Kapibara mendengus", "Kapibara mati", "Langkah kapibara", "Kapibara mengunyah", "Kapibara mendengkur");
+						"Kapibara bergumam", "Kapibara mendengus", "Kapibara mati", "Langkah kapibara", "Kapibara mengunyah", "Kapibara mendengkur",
+						"Kodok berkuak", "Kodok memekik", "Kodok mati", "Langkah kodok", "Kodok berkuak senang", "Kodok menjulurkan lidah", "Kail tercebur",
+						"Kodok dapat ikan", "Kodok main biola", "Kodok menggoyang angklung", "Kodok menabuh kendang");
 				playNames(builder, "Camilan Hewan", "Motor", "Bola Sepak", "Raket", "Kok", "Jaring Gawang", "Net Bulu Tangkis",
 						"GOOOL!", "GOOOL! %s mencetak gol!", "Rally: %s pukulan", "Rally selesai di %s pukulan");
 				wargaNames(builder, "Warga", "Pentungan", "Telur Spawn Warga", "Nih, cobain %s-nya!",
@@ -581,18 +585,17 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 		});
 	}
 
-	private static final List<EntityType<?>> CRITTERS = List.of(BlossomEntities.HAMSTER, BlossomEntities.HEDGEHOG, BlossomEntities.CAPYBARA);
+	private static final List<EntityType<?>> CRITTERS = List.of(BlossomEntities.HAMSTER, BlossomEntities.HEDGEHOG, BlossomEntities.CAPYBARA, BlossomEntities.KODOK);
 
 	private static Item spawnEgg(EntityType<?> critter) {
 		return BuiltInRegistries.ITEM.getValue(Blossom.id(BuiltInRegistries.ENTITY_TYPE.getKey(critter).getPath() + "_spawn_egg"));
 	}
 
 	// names line up with CRITTERS, the egg pattern wraps the critter's name
-	private static void critterNames(FabricLanguageProvider.TranslationBuilder builder, String hamster, String hedgehog, String capybara, String egg) {
-		List<String> names = List.of(hamster, hedgehog, capybara);
+	private static void critterNames(FabricLanguageProvider.TranslationBuilder builder, String egg, String... names) {
 		for (int i = 0; i < CRITTERS.size(); i++) {
-			builder.add(CRITTERS.get(i), names.get(i));
-			builder.add(spawnEgg(CRITTERS.get(i)), egg.formatted(names.get(i)));
+			builder.add(CRITTERS.get(i), names[i]);
+			builder.add(spawnEgg(CRITTERS.get(i)), egg.formatted(names[i]));
 		}
 	}
 

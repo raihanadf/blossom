@@ -34,6 +34,19 @@ public final class BlossomSounds {
 	public static final SoundEvent CAPYBARA_CHEW = register("entity.capybara.chew");
 	public static final SoundEvent CAPYBARA_HAPPY = register("entity.capybara.happy");
 
+	public static final SoundEvent KODOK_AMBIENT = register("entity.kodok.ambient");
+	public static final SoundEvent KODOK_HURT = register("entity.kodok.hurt");
+	public static final SoundEvent KODOK_DEATH = register("entity.kodok.death");
+	public static final SoundEvent KODOK_STEP = register("entity.kodok.step");
+	public static final SoundEvent KODOK_HAPPY = register("entity.kodok.happy");
+	public static final SoundEvent KODOK_TONGUE = register("entity.kodok.tongue");
+	public static final SoundEvent KODOK_CAST = register("entity.kodok.cast");
+	public static final SoundEvent KODOK_CATCH = register("entity.kodok.catch");
+	// the band's stems: one bar loop each, all in the same key and tempo, started together on the loop grid
+	public static final SoundEvent KODOK_BIOLA = register("music.kodok.biola");
+	public static final SoundEvent KODOK_ANGKLUNG = register("music.kodok.angklung");
+	public static final SoundEvent KODOK_KENDANG = register("music.kodok.kendang");
+
 	private BlossomSounds() {
 	}
 
