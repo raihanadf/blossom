@@ -56,6 +56,7 @@ import com.raihanadf.blossom.Blossom;
 import com.raihanadf.blossom.nusantara.StationGate;
 import com.raihanadf.blossom.furniture.LampBlock;
 import com.raihanadf.blossom.registry.BlossomEntities;
+import com.raihanadf.blossom.registry.BlossomSounds;
 import java.util.List;
 import java.util.Map;
 import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider;
@@ -422,6 +423,9 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 				builder.add(MIE_GORENG, "Mie Goreng");
 				builder.add(NASI_GORENG, "Nasi Goreng");
 				critterNames(builder, "Hamster", "Hedgehog", "Capybara", "%s Spawn Egg");
+				subtitles(builder, "Hamster squeaks", "Hamster hurts", "Hamster dies", "Hamster patters", "Hamster munches", "Hamster chirps happily",
+						"Hedgehog snuffles", "Hedgehog squeals", "Hedgehog dies", "Hedgehog patters", "Hedgehog curls up", "Hedgehog roots around", "Hedgehog squeaks happily",
+						"Capybara hums", "Capybara huffs", "Capybara dies", "Capybara steps", "Capybara chews", "Capybara purrs");
 				playNames(builder, "Pet Treat", "Motor", "Football", "Racket", "Shuttlecock", "Goal Net", "Badminton Net",
 						"GOOOAL!", "GOOOAL! %s scores!", "Rally: %s hits", "Rally over at %s hits");
 				wargaNames(builder, "Villager", "Baton", "Villager Spawn Egg", "Here, try some %s!",
@@ -520,6 +524,9 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 				builder.add(MIE_GORENG, "Mie Goreng");
 				builder.add(NASI_GORENG, "Nasi Goreng");
 				critterNames(builder, "Hamster", "Landak", "Kapibara", "Telur Spawn %s");
+				subtitles(builder, "Hamster mencicit", "Hamster kesakitan", "Hamster mati", "Langkah hamster", "Hamster mengunyah", "Hamster mencicit senang",
+						"Landak mengendus", "Landak memekik", "Landak mati", "Langkah landak", "Landak menggulung", "Landak mengorek tanah", "Landak mencicit senang",
+						"Kapibara bergumam", "Kapibara mendengus", "Kapibara mati", "Langkah kapibara", "Kapibara mengunyah", "Kapibara mendengkur");
 				playNames(builder, "Camilan Hewan", "Motor", "Bola Sepak", "Raket", "Kok", "Jaring Gawang", "Net Bulu Tangkis",
 						"GOOOL!", "GOOOL! %s mencetak gol!", "Rally: %s pukulan", "Rally selesai di %s pukulan");
 				wargaNames(builder, "Warga", "Pentungan", "Telur Spawn Warga", "Nih, cobain %s-nya!",
@@ -586,6 +593,13 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 		for (int i = 0; i < CRITTERS.size(); i++) {
 			builder.add(CRITTERS.get(i), names.get(i));
 			builder.add(spawnEgg(CRITTERS.get(i)), egg.formatted(names.get(i)));
+		}
+	}
+
+	// one subtitle per blossom sound, in BlossomSounds.ALL order
+	private static void subtitles(FabricLanguageProvider.TranslationBuilder builder, String... lines) {
+		for (int i = 0; i < BlossomSounds.ALL.size(); i++) {
+			builder.add("subtitles.blossom." + BlossomSounds.ALL.get(i).location().getPath(), lines[i]);
 		}
 	}
 

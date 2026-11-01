@@ -4,6 +4,7 @@ import com.geckolib.model.DefaultedEntityGeoModel;
 import com.geckolib.renderer.GeoEntityRenderer;
 import com.raihanadf.blossom.Blossom;
 import com.raihanadf.blossom.client.render.CookingPotRenderer;
+import com.raihanadf.blossom.client.render.CritterPropLayer;
 import com.raihanadf.blossom.client.render.CuttingBoardRenderer;
 import com.raihanadf.blossom.client.render.TrackRenderer;
 import com.raihanadf.blossom.client.render.LoriRenderer;
@@ -61,6 +62,7 @@ public class BlossomClient implements ClientModInitializer {
 		EntityRendererProvider<T> provider = context -> new GeoEntityRenderer<T, LivingEntityRenderState>(context, model) {
 			{
 				shadowRadius = shadow;
+				withRenderLayer(renderer -> new CritterPropLayer<>(context, renderer));
 			}
 		};
 		EntityRenderers.register(type, provider);

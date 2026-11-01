@@ -1,0 +1,220 @@
+{
+	"entity.hamster.ambient": {
+		"subtitle": "subtitles.blossom.entity.hamster.ambient",
+		"sounds": [
+			{
+				"name": "blossom:entity/hamster_ambient0"
+			},
+			{
+				"name": "blossom:entity/hamster_ambient1"
+			},
+			{
+				"name": "blossom:entity/hamster_ambient2"
+			},
+			{
+				"name": "blossom:entity/hamster_ambient3"
+			}
+		]
+	},
+	"entity.hamster.hurt": {
+		"subtitle": "subtitles.blossom.entity.hamster.hurt",
+		"sounds": [
+			{
+				"name": "blossom:entity/hamster_hurt0"
+			},
+			{
+				"name": "blossom:entity/hamster_hurt1"
+			}
+		]
+	},
+	"entity.hamster.death": {
+		"subtitle": "subtitles.blossom.entity.hamster.death",
+		"sounds": [
+			{
+				"name": "blossom:entity/hamster_death"
+			}
+		]
+	},
+	"entity.hamster.step": {
+		"subtitle": "subtitles.blossom.entity.hamster.step",
+		"sounds": [
+			{
+				"name": "blossom:entity/hamster_step0"
+			},
+			{
+				"name": "blossom:entity/hamster_step1"
+			}
+		]
+	},
+	"entity.hamster.munch": {
+		"subtitle": "subtitles.blossom.entity.hamster.munch",
+		"sounds": [
+			{
+				"name": "blossom:entity/hamster_munch0"
+			},
+			{
+				"name": "blossom:entity/hamster_munch1"
+			}
+		]
+	},
+	"entity.hamster.happy": {
+		"subtitle": "subtitles.blossom.entity.hamster.happy",
+		"sounds": [
+			{
+				"name": "blossom:entity/hamster_happy0"
+			},
+			{
+				"name": "blossom:entity/hamster_happy1"
+			}
+		]
+	},
+	"entity.hedgehog.ambient": {
+		"subtitle": "subtitles.blossom.entity.hedgehog.ambient",
+		"sounds": [
+			{
+				"name": "blossom:entity/hedgehog_ambient0"
+			},
+			{
+				"name": "blossom:entity/hedgehog_ambient1"
+			},
+			{
+				"name": "blossom:entity/hedgehog_ambient2"
+			},
+			{
+				"name": "blossom:entity/hedgehog_ambient3"
+			}
+		]
+	},
+	"entity.hedgehog.hurt": {
+		"subtitle": "subtitles.blossom.entity.hedgehog.hurt",
+		"sounds": [
+			{
+				"name": "blossom:entity/hedgehog_hurt0"
+			},
+			{
+				"name": "blossom:entity/hedgehog_hurt1"
+			}
+		]
+	},
+	"entity.hedgehog.death": {
+		"subtitle": "subtitles.blossom.entity.hedgehog.death",
+		"sounds": [
+			{
+				"name": "blossom:entity/hedgehog_death"
+			}
+		]
+	},
+	"entity.hedgehog.step": {
+		"subtitle": "subtitles.blossom.entity.hedgehog.step",
+		"sounds": [
+			{
+				"name": "blossom:entity/hedgehog_step0"
+			},
+			{
+				"name": "blossom:entity/hedgehog_step1"
+			}
+		]
+	},
+	"entity.hedgehog.happy": {
+		"subtitle": "subtitles.blossom.entity.hedgehog.happy",
+		"sounds": [
+			{
+				"name": "blossom:entity/hedgehog_happy0"
+			},
+			{
+				"name": "blossom:entity/hedgehog_happy1"
+			}
+		]
+	},
+	"entity.hedgehog.curl": {
+		"subtitle": "subtitles.blossom.entity.hedgehog.curl",
+		"sounds": [
+			{
+				"name": "blossom:entity/hedgehog_curl0"
+			},
+			{
+				"name": "blossom:entity/hedgehog_curl1"
+			}
+		]
+	},
+	"entity.hedgehog.dig": {
+		"subtitle": "subtitles.blossom.entity.hedgehog.dig",
+		"sounds": [
+			{
+				"name": "blossom:entity/hedgehog_dig0"
+			},
+			{
+				"name": "blossom:entity/hedgehog_dig1"
+			}
+		]
+	},
+	"entity.capybara.ambient": {
+		"subtitle": "subtitles.blossom.entity.capybara.ambient",
+		"sounds": [
+			{
+				"name": "blossom:entity/capybara_ambient0"
+			},
+			{
+				"name": "blossom:entity/capybara_ambient1"
+			},
+			{
+				"name": "blossom:entity/capybara_ambient2"
+			},
+			{
+				"name": "blossom:entity/capybara_ambient3"
+			}
+		]
+	},
+	"entity.capybara.hurt": {
+		"subtitle": "subtitles.blossom.entity.capybara.hurt",
+		"sounds": [
+			{
+				"name": "blossom:entity/capybara_hurt0"
+			},
+			{
+				"name": "blossom:entity/capybara_hurt1"
+			}
+		]
+	},
+	"entity.capybara.death": {
+		"subtitle": "subtitles.blossom.entity.capybara.death",
+		"sounds": [
+			{
+				"name": "blossom:entity/capybara_death"
+			}
+		]
+	},
+	"entity.capybara.step": {
+		"subtitle": "subtitles.blossom.entity.capybara.step",
+		"sounds": [
+			{
+				"name": "blossom:entity/capybara_step0"
+			},
+			{
+				"name": "blossom:entity/capybara_step1"
+			}
+		]
+	},
+	"entity.capybara.happy": {
+		"subtitle": "subtitles.blossom.entity.capybara.happy",
+		"sounds": [
+			{
+				"name": "blossom:entity/capybara_happy0"
+			},
+			{
+				"name": "blossom:entity/capybara_happy1"
+			}
+		]
+	},
+	"entity.capybara.chew": {
+		"subtitle": "subtitles.blossom.entity.capybara.chew",
+		"sounds": [
+			{
+				"name": "blossom:entity/capybara_chew0"
+			},
+			{
+				"name": "blossom:entity/capybara_chew1"
+			}
+		]
+	}
+}

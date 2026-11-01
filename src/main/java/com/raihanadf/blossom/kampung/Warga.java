@@ -49,7 +49,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
@@ -104,6 +103,11 @@ public class Warga extends PathfinderMob {
 
 	private static final EntityDataAccessor<Integer> JOB = SynchedEntityData.defineId(Warga.class, EntityDataSerializers.INT);
 	private static final EntityDataAccessor<Integer> SKIN = SynchedEntityData.defineId(Warga.class, EntityDataSerializers.INT);
+	// counts up on every wave, so clients see each one as a change
+	private static final EntityDataAccessor<Integer> WAVES = SynchedEntityData.defineId(Warga.class, EntityDataSerializers.INT);
+	private static final int WAVE_TICKS = 24;
+
+	private int waveTicks;
 
 	private BlockPos home;
 	private BlockPos bed;
@@ -225,6 +229,7 @@ public class Warga extends PathfinderMob {
 		super.defineSynchedData(builder);
 		builder.define(JOB, RESIDENT);
 		builder.define(SKIN, 0);
+		builder.define(WAVES, 0);
 	}
 
 	@Override
@@ -233,6 +238,21 @@ public class Warga extends PathfinderMob {
 		if (SKIN.equals(accessor)) {
 			refreshDimensions();
 		}
+		// a new wave from the server: the client plays it out with the arm up for a moment
+		if (WAVES.equals(accessor) && level().isClientSide()) {
+			waveTicks = WAVE_TICKS;
+		}
+	}
+
+	// 0 when not waving, rising to 1 and back down over the wave
+	public float waveAmount(float partialTick) {
+		float t = Math.max(0, waveTicks - partialTick) / WAVE_TICKS;
+		return t <= 0 ? 0 : Math.min(1, Math.min(t, 1 - t) * 5);
+	}
+
+	// how far along the wave the hand is (it goes back and forth a few times)
+	public float waveTime(float partialTick) {
+		return WAVE_TICKS - waveTicks + partialTick;
 	}
 
 	// kids are half size
@@ -270,8 +290,9 @@ public class Warga extends PathfinderMob {
 		});
 	}
 
+	// a hand raised high and waved side to side, not a swing at the air
 	public void wave() {
-		swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, true);
+		entityData.set(WAVES, entityData.get(WAVES) + 1);
 	}
 
 	// the station master raises his paddle and blows the whistle: the train may go
@@ -377,6 +398,9 @@ public class Warga extends PathfinderMob {
 	@Override
 	public void tick() {
 		super.tick();
+		if (waveTicks > 0) {
+			waveTicks--;
+		}
 		// the train that carried this rider is gone
 		if (aboard && !isPassenger() && !level().isClientSide()) {
 			discard();

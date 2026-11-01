@@ -8,13 +8,16 @@ import com.geckolib.animation.RawAnimation;
 import com.geckolib.animation.object.PlayState;
 import com.geckolib.util.GeckoLibUtil;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.function.Predicate;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -30,15 +33,21 @@ import net.minecraft.world.entity.ai.goal.TemptGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
-// shared behaviour for blossom's critters: they notice you, love pets, nap at night and have one special pose
+// shared behaviour for blossom's critters: they notice you, love pets, fidget when idle, nap at night, have one special
+// pose and can wear or carry one little prop (a flower, a berry) that the renderer draws on their `prop` bone
 public abstract class Critter extends Animal implements GeoEntity {
 	public static final int AWAKE = 0;
 	public static final int SLEEPING = 1;
 	public static final int SPECIAL = 2;
 
 	private static final EntityDataAccessor<Integer> POSE = SynchedEntityData.defineId(Critter.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<ItemStack> PROP = SynchedEntityData.defineId(Critter.class, EntityDataSerializers.ITEM_STACK);
 
 	private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 	private int petCooldown;
@@ -56,10 +65,33 @@ public abstract class Critter extends Animal implements GeoEntity {
 		entityData.set(POSE, pose);
 	}
 
+	public ItemStack getProp() {
+		return entityData.get(PROP);
+	}
+
+	protected void setProp(ItemStack stack) {
+		entityData.set(PROP, stack);
+	}
+
+	// the bone the prop is drawn on (in the geo model), and how big
+	public abstract String propBone();
+
+	public float propScale() {
+		return 0.4f;
+	}
+
+	protected abstract SoundEvent stepSound();
+
+	protected abstract SoundEvent happySound();
+
+	// one-shot idle animations, played now and then while it stands around
+	protected abstract List<String> fidgets();
+
 	@Override
 	protected void defineSynchedData(SynchedEntityData.Builder builder) {
 		super.defineSynchedData(builder);
 		builder.define(POSE, AWAKE);
+		builder.define(PROP, ItemStack.EMPTY);
 	}
 
 	@Override
@@ -77,21 +109,29 @@ public abstract class Critter extends Animal implements GeoEntity {
 		goalSelector.addGoal(9, new RandomLookAroundGoal(this));
 	}
 
-	// empty hand right click: a happy wiggle and some hearts
+	// empty hand right click: a hop, hearts and a happy noise. critters with something to give hand it over instead
 	@Override
 	public InteractionResult mobInteract(Player player, InteractionHand hand) {
 		if (!player.getItemInHand(hand).isEmpty()) {
 			return super.mobInteract(player, hand);
 		}
 		if (level() instanceof ServerLevel serverLevel && petCooldown == 0) {
-			petCooldown = 30;
+			petCooldown = 20;
 			serverLevel.sendParticles(ParticleTypes.HEART, getX(), getY() + getBbHeight() + 0.3, getZ(), 2, 0.2, 0.1, 0.2, 0);
-			playSound(getAmbientSound(), 0.8f, getVoicePitch() * 1.2f);
-			if (getCritterPose() != SLEEPING) {
+			if (getCritterPose() == SLEEPING) {
+				// a sleepy one only stirs
+				playSound(happySound(), 0.4f, getVoicePitch() * 0.8f);
+			} else {
+				playSound(happySound(), 0.8f, getVoicePitch());
 				triggerAnim("actions", "happy");
+				petted(serverLevel, player);
 			}
 		}
 		return InteractionResult.SUCCESS;
+	}
+
+	// a critter's own response to a pet, after the hop and the hearts
+	protected void petted(ServerLevel level, Player player) {
 	}
 
 	@Override
@@ -111,6 +151,16 @@ public abstract class Critter extends Animal implements GeoEntity {
 			}
 			playerWasNear = near;
 		}
+		// standing around: groom, look about, yawn... never the same loop for long
+		if (getCritterPose() == AWAKE && getNavigation().isDone() && getRandom().nextInt(160) == 0) {
+			List<String> all = fidgets();
+			triggerAnim("fidget", all.get(getRandom().nextInt(all.size())));
+		}
+	}
+
+	@Override
+	protected void playStepSound(BlockPos pos, BlockState state) {
+		playSound(stepSound(), 0.2f, getVoicePitch());
 	}
 
 	@Override
@@ -121,26 +171,58 @@ public abstract class Critter extends Animal implements GeoEntity {
 		return super.hurtServer(level, source, damage);
 	}
 
+	@Override
+	protected void dropCustomDeathLoot(ServerLevel level, DamageSource source, boolean killedByPlayer) {
+		super.dropCustomDeathLoot(level, source, killedByPlayer);
+		if (!getProp().isEmpty()) {
+			spawnAtLocation(level, getProp());
+		}
+	}
+
+	@Override
+	protected void addAdditionalSaveData(ValueOutput output) {
+		super.addAdditionalSaveData(output);
+		output.store("Prop", ItemStack.OPTIONAL_CODEC, getProp());
+	}
+
+	@Override
+	protected void readAdditionalSaveData(ValueInput input) {
+		super.readAdditionalSaveData(input);
+		setProp(input.read("Prop", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY));
+	}
+
 	// animations live in assets/blossom/geckolib/animations/entity/<name>.animation.json as animation.<name>.<action>
 	protected String animation(String action) {
 		return "animation." + BuiltInRegistries.ENTITY_TYPE.getKey(getType()).getPath() + "." + action;
 	}
 
+	// the looping animation for what it's doing right now
+	protected String baseAction(boolean moving) {
+		int pose = getCritterPose();
+		return pose == SLEEPING ? "sleep" : pose == SPECIAL ? "special" : moving ? "walk" : "idle";
+	}
+
+	protected RawAnimation special() {
+		return RawAnimation.begin().thenLoop(animation("special"));
+	}
+
 	@Override
 	public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-		RawAnimation idle = RawAnimation.begin().thenLoop(animation("idle"));
-		RawAnimation walk = RawAnimation.begin().thenLoop(animation("walk"));
-		RawAnimation sleep = RawAnimation.begin().thenLoop(animation("sleep"));
-		RawAnimation special = RawAnimation.begin().thenPlayAndHold(animation("special"));
+		RawAnimation special = special();
 		controllers.add(new AnimationController<Critter>("base", 5, test -> {
-			int pose = test.animatable().getCritterPose();
-			return test.setAndContinue(pose == SLEEPING ? sleep : pose == SPECIAL ? special : test.isMoving() ? walk : idle);
+			String action = test.animatable().baseAction(test.isMoving());
+			return test.setAndContinue(action.equals("special") ? special : RawAnimation.begin().thenLoop(animation(action)));
 		}));
 		AnimationController<Critter> actions = new AnimationController<Critter>("actions", 3, test -> PlayState.STOP)
 				.triggerableAnim("happy", RawAnimation.begin().thenPlay(animation("happy")))
 				.triggerableAnim("notice", RawAnimation.begin().thenPlay(animation("notice")));
 		addActions(actions);
 		controllers.add(actions);
+		AnimationController<Critter> fidget = new AnimationController<Critter>("fidget", 4, test -> PlayState.STOP);
+		for (String name : fidgets()) {
+			fidget.triggerableAnim(name, RawAnimation.begin().thenPlay(animation(name)));
+		}
+		controllers.add(fidget);
 	}
 
 	// critters with extra one-shot animations register them here
@@ -197,6 +279,61 @@ public abstract class Critter extends Animal implements GeoEntity {
 		@Override
 		public void stop() {
 			if (critter.getCritterPose() == pose) {
+				critter.setCritterPose(AWAKE);
+			}
+		}
+	}
+
+	// small critters wander over to a lounging capybara and doze off right beside it, everyone loves a capybara
+	public static class CuddleGoal extends Goal {
+		private final Critter critter;
+		private Capybara friend;
+		private int ticksLeft;
+
+		public CuddleGoal(Critter critter) {
+			this.critter = critter;
+			setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK, Flag.JUMP));
+		}
+
+		@Override
+		public boolean canUse() {
+			if (critter.getRandom().nextInt(300) != 0 || critter.getCritterPose() != AWAKE || critter.isPassenger()) {
+				return false;
+			}
+			List<Capybara> lounging = critter.level().getEntitiesOfClass(Capybara.class, critter.getBoundingBox().inflate(10), c -> c.getCritterPose() == SPECIAL);
+			friend = lounging.isEmpty() ? null : lounging.getFirst();
+			return friend != null;
+		}
+
+		@Override
+		public boolean canContinueToUse() {
+			return friend.isAlive() && friend.getCritterPose() == SPECIAL && critter.hurtTime == 0 && (ticksLeft > 0 || critter.getCritterPose() == AWAKE);
+		}
+
+		@Override
+		public void start() {
+			ticksLeft = 300 + critter.getRandom().nextInt(600);
+		}
+
+		@Override
+		public void tick() {
+			if (critter.getCritterPose() == SLEEPING) {
+				ticksLeft--;
+				return;
+			}
+			critter.getLookControl().setLookAt(friend);
+			if (critter.distanceToSqr(friend) > 1.6 * 1.6) {
+				critter.getNavigation().moveTo(friend, 1.0);
+				return;
+			}
+			critter.getNavigation().stop();
+			critter.setCritterPose(SLEEPING);
+		}
+
+		@Override
+		public void stop() {
+			friend = null;
+			if (critter.getCritterPose() == SLEEPING) {
 				critter.setCritterPose(AWAKE);
 			}
 		}

@@ -6,6 +6,7 @@ import com.raihanadf.blossom.pets.PetFeeding;
 import com.raihanadf.blossom.registry.BlossomBlocks;
 import com.raihanadf.blossom.registry.BlossomEntities;
 import com.raihanadf.blossom.registry.BlossomItems;
+import com.raihanadf.blossom.registry.BlossomSounds;
 import com.raihanadf.blossom.registry.BlossomWorldgen;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.Identifier;
@@ -18,6 +19,7 @@ public class Blossom implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		BlossomSounds.init();
 		BlossomBlocks.init();
 		BlossomEntities.init();
 		BlossomWorldgen.init();
