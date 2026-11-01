@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "bottom": "blossom:block/genteng_brown",
+    "side": "blossom:block/genteng_brown",
+    "top": "blossom:block/genteng_brown"
+  }
+}

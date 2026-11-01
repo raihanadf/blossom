@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "blossom:block/shutter_blue",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "blossom:block/shutter_blue"
+    },
+    "facing=south": {
+      "model": "blossom:block/shutter_blue",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "blossom:block/shutter_blue",
+      "y": 270
+    }
+  }
+}

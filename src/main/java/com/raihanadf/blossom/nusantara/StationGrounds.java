@@ -232,7 +232,7 @@ public final class StationGrounds {
 					if (ox * ox + oz * oz > r * r + 1 || ox == 0 && oz == 0 && dy <= 5) {
 						continue;
 					}
-					if (site.get(x + ox, g + dy, z + oz).isAir()) {
+					if (site.has(x + ox, z + oz) && site.get(x + ox, g + dy, z + oz).isAir()) {
 						site.set(x + ox, g + dy, z + oz, Site.block("jungle_leaves").setValue(BlockStateProperties.PERSISTENT, true));
 					}
 				}

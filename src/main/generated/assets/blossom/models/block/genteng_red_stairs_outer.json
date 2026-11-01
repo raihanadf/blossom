@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/outer_stairs",
+  "textures": {
+    "bottom": "blossom:block/genteng_red",
+    "side": "blossom:block/genteng_red",
+    "top": "blossom:block/genteng_red"
+  }
+}

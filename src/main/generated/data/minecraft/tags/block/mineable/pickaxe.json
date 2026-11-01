@@ -1,5 +1,21 @@
 {
   "values": [
-    "blossom:cooking_pot"
+    "blossom:cooking_pot",
+    "blossom:genteng_red",
+    "blossom:genteng_red_stairs",
+    "blossom:genteng_red_slab",
+    "blossom:genteng_brown",
+    "blossom:genteng_brown_stairs",
+    "blossom:genteng_brown_slab",
+    "blossom:genteng_black",
+    "blossom:genteng_black_stairs",
+    "blossom:genteng_black_slab",
+    "blossom:plaster_white",
+    "blossom:plaster_cream",
+    "blossom:plaster_mint",
+    "blossom:plaster_sky",
+    "blossom:plaster_pink",
+    "blossom:plaster_peach",
+    "blossom:roster"
   ]
 }

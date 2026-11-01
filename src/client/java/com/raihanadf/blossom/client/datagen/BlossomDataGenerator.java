@@ -1,20 +1,29 @@
 package com.raihanadf.blossom.client.datagen;
 
+import static com.raihanadf.blossom.registry.BlossomBlocks.BALLAST;
 import static com.raihanadf.blossom.registry.BlossomBlocks.CHAIRS;
 import static com.raihanadf.blossom.registry.BlossomBlocks.COOKING_POT;
 import static com.raihanadf.blossom.registry.BlossomBlocks.CUTTING_BOARD;
-import static com.raihanadf.blossom.registry.BlossomBlocks.GOAL_NET;
-import static com.raihanadf.blossom.registry.BlossomBlocks.SPORTS_NET;
-import static com.raihanadf.blossom.registry.BlossomBlocks.TICKET_GATE;
 import static com.raihanadf.blossom.registry.BlossomBlocks.EXIT_GATE;
+import static com.raihanadf.blossom.registry.BlossomBlocks.GOAL_NET;
 import static com.raihanadf.blossom.registry.BlossomBlocks.LAMP;
 import static com.raihanadf.blossom.registry.BlossomBlocks.RICE;
 import static com.raihanadf.blossom.registry.BlossomBlocks.RICE_CROP;
+import static com.raihanadf.blossom.registry.BlossomBlocks.SPORTS_NET;
 import static com.raihanadf.blossom.registry.BlossomBlocks.TABLES;
-import static com.raihanadf.blossom.registry.BlossomBlocks.WOODS;
-import static com.raihanadf.blossom.registry.BlossomBlocks.BALLAST;
+import static com.raihanadf.blossom.registry.BlossomBlocks.TICKET_GATE;
 import static com.raihanadf.blossom.registry.BlossomBlocks.TRACK;
+import static com.raihanadf.blossom.registry.BlossomBlocks.WOODS;
 import static com.raihanadf.blossom.registry.BlossomItems.APPLE_PORRIDGE;
+import static com.raihanadf.blossom.registry.BlossomBlocks.GENTENG;
+import static com.raihanadf.blossom.registry.BlossomBlocks.GENTENG_COLORS;
+import static com.raihanadf.blossom.registry.BlossomBlocks.GENTENG_SLABS;
+import static com.raihanadf.blossom.registry.BlossomBlocks.GENTENG_STAIRS;
+import static com.raihanadf.blossom.registry.BlossomBlocks.PLASTER;
+import static com.raihanadf.blossom.registry.BlossomBlocks.PLASTER_COLORS;
+import static com.raihanadf.blossom.registry.BlossomBlocks.ROSTER;
+import static com.raihanadf.blossom.registry.BlossomBlocks.SHUTTERS;
+import static com.raihanadf.blossom.registry.BlossomBlocks.SHUTTER_COLORS;
 import static com.raihanadf.blossom.registry.BlossomItems.BATON;
 import static com.raihanadf.blossom.registry.BlossomItems.FOOTBALL;
 import static com.raihanadf.blossom.registry.BlossomItems.MOTOR;
@@ -97,6 +106,23 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 			public void generateBlockStateModels(BlockModelGenerators blocks) {
 				// eight growth ages share four drawings, also writes the flat rice item model
 				blocks.createCropBlock(RICE_CROP, CropBlock.AGE, 0, 0, 1, 1, 2, 2, 2, 3);
+				for (String color : GENTENG_COLORS) {
+					Block base = GENTENG.get(color);
+					// the family makes the full block's model too
+					blocks.family(base).stairs(GENTENG_STAIRS.get(color)).slab(GENTENG_SLABS.get(color));
+				}
+				for (String color : PLASTER_COLORS) {
+					blocks.createTrivialCube(PLASTER.get(color));
+				}
+				Identifier roster = Blossom.id("block/roster");
+				blocks.blockStateOutput.accept(MultiVariantGenerator.dispatch(ROSTER, BlockModelGenerators.plainVariant(roster)));
+				blocks.registerSimpleItemModel(ROSTER, roster);
+				for (String color : SHUTTER_COLORS) {
+					Identifier shutter = Blossom.id("block/shutter_" + color);
+					blocks.blockStateOutput.accept(MultiVariantGenerator.dispatch(SHUTTERS.get(color), BlockModelGenerators.plainVariant(shutter))
+							.with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING));
+					blocks.registerSimpleItemModel(SHUTTERS.get(color), shutter);
+				}
 
 				// kitchen block shapes are hand-written in resources/assets/blossom/models/block
 				for (Block block : List.of(CUTTING_BOARD, COOKING_POT, GOAL_NET)) {
@@ -184,7 +210,12 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 			@Override
 			public void generate() {
 				for (Block block : allBlocks()) {
-					if (block != RICE_CROP) {
+					if (block == RICE_CROP) {
+						continue;
+					}
+					if (GENTENG_SLABS.containsValue(block)) {
+						add(block, createSlabItemTable(block));
+					} else {
 						dropSelf(block);
 					}
 				}
@@ -197,10 +228,14 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 			@Override
 			protected void addTags(HolderLookup.Provider lookup) {
 				for (Block block : allBlocks()) {
-					if (block == RICE_CROP) {
-						continue;
-					}
-					builder(block == COOKING_POT ? BlockTags.MINEABLE_WITH_PICKAXE : block == BALLAST ? BlockTags.MINEABLE_WITH_SHOVEL : BlockTags.MINEABLE_WITH_AXE).add(block.builtInRegistryHolder().key());
+					if (block == RICE_CROP) continue;
+					// clay, plaster and stone take a pickaxe, ballast a shovel, everything else is wood
+					boolean stone = block == COOKING_POT || block == ROSTER || GENTENG.containsValue(block) || GENTENG_STAIRS.containsValue(block)
+							|| GENTENG_SLABS.containsValue(block) || PLASTER.containsValue(block);
+					var tag = block == BALLAST ? BlockTags.MINEABLE_WITH_SHOVEL : stone ? BlockTags.MINEABLE_WITH_PICKAXE : BlockTags.MINEABLE_WITH_AXE;
+					builder(tag).add(block.builtInRegistryHolder().key());
+					if (GENTENG_STAIRS.containsValue(block)) builder(BlockTags.STAIRS).add(block.builtInRegistryHolder().key());
+					if (GENTENG_SLABS.containsValue(block)) builder(BlockTags.SLABS).add(block.builtInRegistryHolder().key());
 				}
 			}
 		});
@@ -289,6 +324,31 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 								.define('T', Items.STICK)
 								.unlockedBy("has_string", has(Items.STRING))
 								.save(output);
+						for (String color : GENTENG_COLORS) {
+							shapeless(RecipeCategory.BUILDING_BLOCKS, GENTENG.get(color), 4)
+									.requires(Items.CLAY_BALL, 8).requires(dye(color)).unlockedBy("has_clay", has(Items.CLAY_BALL)).save(output);
+							stairBuilder(GENTENG_STAIRS.get(color), net.minecraft.world.item.crafting.Ingredient.of(GENTENG.get(color)))
+									.unlockedBy("has_genteng", has(GENTENG.get(color))).save(output);
+							slabBuilder(RecipeCategory.BUILDING_BLOCKS, GENTENG_SLABS.get(color), net.minecraft.world.item.crafting.Ingredient.of(GENTENG.get(color)))
+									.unlockedBy("has_genteng", has(GENTENG.get(color))).save(output);
+						}
+						for (String color : PLASTER_COLORS) {
+							shapeless(RecipeCategory.BUILDING_BLOCKS, PLASTER.get(color), 4)
+									.requires(Items.SAND).requires(Items.GRAVEL).requires(Items.CLAY_BALL).requires(dye(color))
+									.unlockedBy("has_sand", has(Items.SAND)).save(output);
+						}
+						shaped(RecipeCategory.BUILDING_BLOCKS, ROSTER, 4)
+								.pattern("SS").pattern("SS").define('S', Items.STONE)
+								.unlockedBy("has_stone", has(Items.STONE)).save(output);
+						for (String color : SHUTTER_COLORS) {
+							shaped(RecipeCategory.DECORATIONS, SHUTTERS.get(color), 2)
+									.pattern("##")
+									.pattern("#D")
+									.pattern("##")
+									.define('#', ItemTags.PLANKS)
+									.define('D', dye(color))
+									.unlockedBy("has_planks", has(ItemTags.PLANKS)).save(output);
+						}
 						for (String wood : WOODS) {
 							Item planks = BuiltInRegistries.ITEM.getValue(Identifier.withDefaultNamespace(wood + "_planks"));
 							shaped(RecipeCategory.DECORATIONS, CHAIRS.get(wood))
@@ -326,6 +386,14 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 				builder.add(CUTTING_BOARD, "Cutting Board");
 				builder.add(COOKING_POT, "Cooking Pot");
 				builder.add(LAMP, "Lamp");
+				for (String color : GENTENG_COLORS) {
+					builder.add(GENTENG.get(color), titleCase(color) + " Genteng");
+					builder.add(GENTENG_STAIRS.get(color), titleCase(color) + " Genteng Stairs");
+					builder.add(GENTENG_SLABS.get(color), titleCase(color) + " Genteng Slab");
+				}
+				for (String color : PLASTER_COLORS) builder.add(PLASTER.get(color), titleCase(color) + " Plaster");
+				builder.add(ROSTER, "Roster");
+				for (String color : SHUTTER_COLORS) builder.add(SHUTTERS.get(color), titleCase(color) + " Shutter");
 				builder.add(TRACK, "Track");
 				builder.add(BALLAST, "Ballast");
 				builder.add(TRACK_PIECE, "Track Piece");
@@ -415,6 +483,16 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 				builder.add(CUTTING_BOARD, "Talenan");
 				builder.add(COOKING_POT, "Panci Masak");
 				builder.add(LAMP, "Lampu");
+				Map<String, String> warna = Map.of("red", "Merah", "brown", "Cokelat", "black", "Hitam", "white", "Putih", "cream", "Krem",
+						"mint", "Mint", "sky", "Biru Muda", "pink", "Merah Muda", "peach", "Persik", "green", "Hijau");
+				for (String color : GENTENG_COLORS) {
+					builder.add(GENTENG.get(color), "Genteng " + warna.get(color));
+					builder.add(GENTENG_STAIRS.get(color), "Tangga Genteng " + warna.get(color));
+					builder.add(GENTENG_SLABS.get(color), "Lempeng Genteng " + warna.get(color));
+				}
+				for (String color : PLASTER_COLORS) builder.add(PLASTER.get(color), "Tembok " + warna.get(color));
+				builder.add(ROSTER, "Roster");
+				for (String color : SHUTTER_COLORS) builder.add(SHUTTERS.get(color), "Krepyak " + (color.equals("blue") ? "Biru" : warna.get(color)));
 				builder.add(TRACK, "Rel");
 				builder.add(BALLAST, "Batu Balas");
 				builder.add(TRACK_PIECE, "Potongan Rel");
@@ -551,6 +629,19 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 		return BuiltInRegistries.BLOCK.getKey(block).getPath();
 	}
 
+	private static Item dye(String color) {
+		return switch (color) {
+			case "red" -> Items.DYE.red();
+			case "brown" -> Items.DYE.brown();
+			case "black" -> Items.DYE.black();
+			case "white" -> Items.DYE.white();
+			case "cream", "peach" -> Items.DYE.orange();
+			case "mint", "green" -> Items.DYE.green();
+			case "sky", "blue" -> Items.DYE.blue();
+			case "pink" -> Items.DYE.pink();
+			default -> throw new IllegalArgumentException(color);
+		};
+	}
 	private static String titleCase(String id) {
 		StringBuilder out = new StringBuilder();
 		for (String word : id.split("_")) {

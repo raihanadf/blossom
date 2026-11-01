@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "minecraft:sand",
+    "minecraft:gravel",
+    "minecraft:clay_ball",
+    "minecraft:white_dye"
+  ],
+  "result": {
+    "count": 4,
+    "id": "blossom:plaster_white"
+  }
+}

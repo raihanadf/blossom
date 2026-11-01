@@ -77,9 +77,10 @@ public class Settlement {
 		name = FRONT[Math.floorMod(network.hash(cx, cz, 1), FRONT.length)] + BACK[Math.floorMod(network.hash(cx, cz, 2), BACK.length)];
 		int roll = Math.floorMod(network.hash(cx, cz, 3), 100);
 		tier = roll < 30 ? 0 : roll < 58 ? 1 : roll < 82 ? 2 : 3;
+		// a desa (besar) is one kampung of 3-15 (16-30) houses, the towns count every building in them
 		size = switch (tier) {
-			case 0 -> 5 + Math.floorMod(network.hash(cx, cz, 4), 6);
-			case 1 -> 11 + Math.floorMod(network.hash(cx, cz, 4), 10);
+			case 0 -> 3 + Math.floorMod(network.hash(cx, cz, 4), 13);
+			case 1 -> 16 + Math.floorMod(network.hash(cx, cz, 4), 15);
 			case 2 -> 25 + Math.floorMod(network.hash(cx, cz, 4), 21);
 			default -> 50 + Math.floorMod(network.hash(cx, cz, 4), 21);
 		};

@@ -9,6 +9,7 @@ import com.raihanadf.blossom.cooking.RiceCropBlock;
 import com.raihanadf.blossom.furniture.LampBlock;
 import com.raihanadf.blossom.furniture.SeatBlock;
 import com.raihanadf.blossom.furniture.ShapedBlock;
+import com.raihanadf.blossom.furniture.ShutterBlock;
 import com.raihanadf.blossom.nusantara.BallastBlock;
 import com.raihanadf.blossom.nusantara.StationGate;
 import com.raihanadf.blossom.nusantara.TrackBlock;
@@ -31,6 +32,12 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.Half;
+import net.minecraft.world.level.block.state.properties.SlabType;
+import net.minecraft.world.level.block.state.properties.StairsShape;
+import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
@@ -42,7 +49,15 @@ public final class BlossomBlocks {
 	// every vanilla wood, furniture is made from (and looks like) the planks you craft it with
 	public static final List<String> WOODS = List.of("oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "pale_oak",
 			"mangrove", "cherry", "poplar", "bamboo", "crimson", "warped");
-
+	public static final List<String> GENTENG_COLORS = List.of("red", "brown", "black");
+	public static final Map<String, Block> GENTENG = new LinkedHashMap<>();
+	public static final Map<String, Block> GENTENG_STAIRS = new LinkedHashMap<>();
+	public static final Map<String, Block> GENTENG_SLABS = new LinkedHashMap<>();
+	public static final List<String> PLASTER_COLORS = List.of("white", "cream", "mint", "sky", "pink", "peach");
+	public static final Map<String, Block> PLASTER = new LinkedHashMap<>();
+	public static final Block ROSTER;
+	public static final List<String> SHUTTER_COLORS = List.of("green", "blue", "brown");
+	public static final Map<String, Block> SHUTTERS = new LinkedHashMap<>();
 	public static final Block CUTTING_BOARD = register("cutting_board", CuttingBoardBlock::new,
 			BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).strength(1f).sound(SoundType.WOOD).noOcclusion());
 	public static final Block COOKING_POT = register("cooking_pot", CookingPotBlock::new,
@@ -83,6 +98,23 @@ public final class BlossomBlocks {
 			Blossom.id("cooking_pot"), new BlockEntityType<>(CookingPotBlockEntity::new, Set.of(COOKING_POT)));
 
 	static {
+		for (String color : GENTENG_COLORS) {
+			Block base = register("genteng_" + color, Block::new, BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(2f).sound(SoundType.STONE));
+			GENTENG.put(color, base);
+			GENTENG_STAIRS.put(color, register("genteng_" + color + "_stairs",
+					p -> new StairBlock(base.defaultBlockState(), p), BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(2f).sound(SoundType.STONE)));
+			GENTENG_SLABS.put(color, register("genteng_" + color + "_slab", SlabBlock::new,
+					BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(2f).sound(SoundType.STONE)));
+		}
+		for (String color : PLASTER_COLORS) {
+			PLASTER.put(color, register("plaster_" + color, Block::new,
+					BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_PINK).strength(1.2f).sound(SoundType.STONE)));
+		}
+		ROSTER = register("roster", Block::new, BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(1.5f).sound(SoundType.STONE).noOcclusion().isValidSpawn((state, level, pos, type) -> false).isRedstoneConductor((state, level, pos) -> false).isSuffocating((state, level, pos) -> false).isViewBlocking((state, level, pos, box) -> false));
+		for (String color : SHUTTER_COLORS) {
+			SHUTTERS.put(color, register("shutter_" + color, ShutterBlock::new,
+					BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).strength(1f).sound(SoundType.WOOD).noOcclusion().dynamicShape().isSuffocating((state, level, pos) -> false).isViewBlocking((state, level, pos, box) -> false)));
+		}
 		for (String wood : WOODS) {
 			// chair seat is flat so a vanilla cushion can sit on it, table top is flush so a carpet makes a tablecloth
 			CHAIRS.put(wood, register(wood + "_chair", p -> new SeatBlock(p, 10 / 16.0,

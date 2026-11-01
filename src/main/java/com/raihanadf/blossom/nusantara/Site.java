@@ -162,6 +162,10 @@ public class Site {
 	// count trees, so keep going up until a run of open air (else the crowns of trees float over a cutting). it only
 	// takes away the land and what grows on it: at anything built (a viaduct over a road, a house) it stops
 	public void clearAbove(int x, int y, int z) {
+		// it only ever writes in this chunk, so never read a column outside it (worldgen flags that as unsafe)
+		if (!has(x, z)) {
+			return;
+		}
 		int top = Math.max(top(x, z), y + 6);
 		int open = 0;
 		for (int k = y + 1; k <= level.getMaxY() && (k <= top + 1 || open < 8); k++) {

@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "blossom:block/genteng_black_slab"
+    },
+    "type=double": {
+      "model": "blossom:block/genteng_black"
+    },
+    "type=top": {
+      "model": "blossom:block/genteng_black_slab_top"
+    }
+  }
+}
