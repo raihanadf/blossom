@@ -81,7 +81,9 @@ public class Warga extends PathfinderMob {
 	public static final int TRAVELER = 8;
 	// rides the inspection trolley (lori inspeksi) ahead of the trains
 	public static final int INSPECTOR = 9;
-	private static final List<String> JOBS = List.of("resident", "farmer", "cook", "guard", "kid", "ppka", "passenger", "vendor", "traveler", "inspector");
+	// the duck herder (angon): walks the flock slowly between the water and the fields, the bebek line up behind him
+	public static final int ANGON = 10;
+	private static final List<String> JOBS = List.of("resident", "farmer", "cook", "guard", "kid", "ppka", "passenger", "vendor", "traveler", "inspector", "angon");
 
 	// skin numbers: 12 men, 12 women, 4 boys, 4 girls, then the uniforms (textures/entity/warga/<skinName>.png)
 	public static final int SKINS_PER_GROUP = 12;
@@ -206,6 +208,8 @@ public class Warga extends PathfinderMob {
 			case COOK -> BlossomItems.KITCHEN_KNIFE;
 			case GUARD -> BlossomItems.BATON;
 			case INSPECTOR -> Items.IRON_PICKAXE;
+			// the long bamboo pole he steers the ducks with
+			case ANGON -> Items.BAMBOO;
 			case VENDOR -> SNACKS.get(random.nextInt(SNACKS.size()));
 			// a ticket in hand
 			case PASSENGER, TRAVELER -> random.nextInt(3) == 0 ? Items.PAPER : Items.AIR;
@@ -615,6 +619,7 @@ public class Warga extends PathfinderMob {
 				case COOK -> cook();
 				case PASSENGER -> pace(5, 400, 0.5);
 				case TRAVELER -> pace(10, 200, 0.6);
+				case ANGON -> herd();
 				default -> pace(3, 300, 0.8);
 			}
 		}
@@ -629,6 +634,16 @@ public class Warga extends PathfinderMob {
 				}
 			}
 			walkTo(target, 1.5, speed);
+		}
+
+		// the angon walks the flock slowly from spot to spot round the sawah, stopping a while at each
+		private void herd() {
+			if (target == null || walkTo(target, 1.5, 0.5) && getRandom().nextInt(80) == 0) {
+				target = work.offset(getRandom().nextInt(25) - 12, 0, getRandom().nextInt(25) - 12);
+				if (onTrack(level(), target) || onTrack(level(), target.below())) {
+					target = work;
+				}
+			}
 		}
 
 		private void farm() {

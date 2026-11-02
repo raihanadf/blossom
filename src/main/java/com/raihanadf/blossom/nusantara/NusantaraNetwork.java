@@ -471,6 +471,31 @@ public class NusantaraNetwork {
 			return y;
 		}
 
+		// a bridge stands at least two above the water it crosses, never sunk into it (the dive towards a tube used to
+		// take one under the sea, and the deck cut a dry trench through the water); the line climbs to it at the grade
+		// on both sides, only a station's own level at the ends never moves
+		private static double[] lifted(double[] y, double[] water, boolean[] tube, boolean[] pinned, double grade) {
+			int coarse = y.length;
+			for (int pass = 0; pass < 4; pass++) {
+				for (int c = 0; c < coarse; c++) {
+					if (!pinned[c] && water[c] > -999 && !tube[c]) {
+						y[c] = Math.max(y[c], water[c] + 2);
+					}
+				}
+				for (int c = 1; c < coarse; c++) {
+					if (!pinned[c]) {
+						y[c] = Math.max(y[c], y[c - 1] - grade);
+					}
+				}
+				for (int c = coarse - 2; c >= 0; c--) {
+					if (!pinned[c]) {
+						y[c] = Math.max(y[c], y[c + 1] - grade);
+					}
+				}
+			}
+			return y;
+		}
+
 		private synchronized void profile() {
 			if (bed != null) {
 				return;
@@ -549,25 +574,15 @@ public class NusantaraNetwork {
 			double free = Math.max(1, pinB - pinA);
 			// a gentle grade: the route itself already winds along the land, so banks, viaducts and tunnels stay small
 			double grade = Math.max(0.09, Math.abs(yb - ya) / free * 1.15) * step;
-			double[] y = graded(want, pinned, pinA, ya, yb, grade, step);
-			// a tube the grade can't get down to the bottom would stand in the open water: then the line crosses on bridges
+			double[] y = lifted(graded(want, pinned, pinA, ya, yb, grade, step), water, tube, pinned, grade);
+			// a tube the grade can't get down to the bottom (or that lifting the bridges before it pulled up) would stand
+			// in the open water: then every crossing of this line goes back to bridges, and the dives towards them go
 			for (int c = 0; c < coarse; c++) {
-				if (!tube[c]) {
-					continue;
-				}
-				int end = c;
-				boolean deep = true;
-				while (end < coarse && tube[end]) {
-					deep &= y[end] + 8 <= water[end];
-					end++;
-				}
-				if (!deep) {
-					// every crossing of this line goes back to bridges, and the dives towards them go
+				if (tube[c] && y[c] + 8 > water[c]) {
 					tube = new boolean[coarse];
-					y = graded(plain, pinned, pinA, ya, yb, grade, step);
+					y = lifted(graded(plain, pinned, pinA, ya, yb, grade, step), water, tube, pinned, grade);
 					break;
 				}
-				c = end;
 			}
 			// how each stretch gets through the land, short stretches folded into their neighbours
 			Mode[] cm = new Mode[coarse];
@@ -748,6 +763,22 @@ public class NusantaraNetwork {
 		public int stationBallast() {
 			return 3;
 		}
+
+		// whether this column is within `margin` of the ballast somewhere out in the open (tunnels don't count)
+		public boolean passes(int x, int z, int margin) {
+			if (x < minX - 40 || x > maxX + 40 || z < minZ - 40 || z > maxZ + 40) {
+				return false;
+			}
+			for (int i = 0; i < xs.length; i += 2) {
+				double dx = xs[i] - x;
+				double dz = zs[i] - z;
+				double reach = ballast(i) + margin;
+				if (dx * dx + dz * dz <= reach * reach && mode(i) != Mode.TUNNEL) {
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 
 	public @Nullable Edge edge(int cx, int cz, boolean east) {
@@ -775,6 +806,23 @@ public class NusantaraNetwork {
 			}
 		}
 		return out;
+	}
+
+	// whether blossom builds at this column: a line and its banks, or a settlement with its station and fields. wild
+	// trees, fallen logs, mossy boulders and bamboo never take root there, so there's nothing to cut back
+	// (lost cities gets the same by building before the trees grow: saplings won't take on its stone)
+	public boolean reserved(int x, int z) {
+		for (Settlement settlement : settlementsNear(x, z)) {
+			if (settlement.covers(x, z)) {
+				return true;
+			}
+		}
+		for (Edge edge : edgesNear(x, z)) {
+			if (edge.passes(x, z, 7)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public @Nullable Edge edgeByKey(long k) {

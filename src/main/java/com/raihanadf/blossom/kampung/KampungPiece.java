@@ -4,6 +4,8 @@ import static com.raihanadf.blossom.kampung.KampungSite.block;
 import static com.raihanadf.blossom.kampung.KampungSite.facing;
 import static com.raihanadf.blossom.nusantara.Site.isNatural;
 
+import com.raihanadf.blossom.critters.Critter;
+import com.raihanadf.blossom.critters.Kucing;
 import com.raihanadf.blossom.kampung.KampungPlan.Building;
 import com.raihanadf.blossom.kampung.KampungPlan.Kind;
 import com.raihanadf.blossom.kampung.KampungPlan.Lane;
@@ -21,6 +23,7 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.StructureManager;
@@ -530,7 +533,8 @@ public class KampungPiece extends StructurePiece {
 		}
 	}
 
-	// the residents: one cook, a farmer, the rest just live here, the satpam at the gate and whoever keeps the warung
+	// the residents: one cook, a farmer, the duck herder, the rest just live here, the satpam at the gate and whoever
+	// keeps the warung. a few houses keep a cat, and the angon's flock waits for him by the sawah
 	private void moveIn(KampungSite site) {
 		Building kitchen = find(Kind.KITCHEN);
 		Building field = find(Kind.FIELD);
@@ -539,6 +543,7 @@ public class KampungPiece extends StructurePiece {
 		BlockPos center = new BlockPos(cx, ground + 1, cz);
 		int houseIndex = 0;
 		int index = 0;
+		int cats = 0;
 		for (Building house : plan.buildings) {
 			if (house.kind() != Kind.HOUSE) {
 				continue;
@@ -549,9 +554,10 @@ public class KampungPiece extends StructurePiece {
 			BlockPos inside = world(house.x(house.width() / 2, front), floor, house.z(house.width() / 2, front));
 			RandomSource random = RandomSource.create(plan.seed + houseIndex);
 			for (int i = 0; i < house.residents(); i++) {
-				int job = i > 0 ? Warga.RESIDENT : houseIndex == 0 && kitchen != null ? Warga.COOK : houseIndex == 1 && field != null ? Warga.FARMER : Warga.RESIDENT;
+				int job = i > 0 ? Warga.RESIDENT : houseIndex == 0 && kitchen != null ? Warga.COOK : houseIndex == 1 && field != null ? Warga.FARMER
+						: houseIndex == 2 && field != null ? Warga.ANGON : Warga.RESIDENT;
 				BlockPos work = job == Warga.COOK ? world(kitchen.x(kitchen.width() / 2, 1), ground + 2, kitchen.z(kitchen.width() / 2, 1))
-						: job == Warga.FARMER ? world(field.centerX(), ground, field.centerZ()) : null;
+						: job == Warga.FARMER || job == Warga.ANGON ? world(field.centerX(), ground, field.centerZ()) : null;
 				int bx = i == 0 ? 1 : house.width() - 2;
 				BlockPos bed = world(house.x(bx, 1), floor, house.z(bx, 1));
 				// a couple: the first one a man, the second a woman, otherwise anyone
@@ -563,6 +569,11 @@ public class KampungPiece extends StructurePiece {
 			if (house.residents() == 2 && random.nextInt(3) != 0) {
 				spawn(site, inside, Warga.KID, Warga.SKIN_BOYS + random.nextInt(8), inside, null, null, center, radius);
 			}
+			// every few houses there's a cat about
+			if (cats < 3 && random.nextInt(3) == 0) {
+				critter(site, BlossomEntities.KUCING, inside.relative(house.front()), center, radius);
+				cats++;
+			}
 			houseIndex++;
 		}
 		if (post != null) {
@@ -573,6 +584,15 @@ public class KampungPiece extends StructurePiece {
 		if (warung != null) {
 			BlockPos behind = world(warung.x(warung.width() / 2, warung.depth() - 3), ground + 1, warung.z(warung.width() / 2, warung.depth() - 3));
 			spawn(site, behind, Warga.VENDOR, Warga.SKIN_WOMEN + RandomSource.create(plan.seed).nextInt(Warga.SKINS_PER_GROUP), behind, null, behind, center, radius);
+		}
+		// the angon's ducks, out by the sawah
+		if (field != null && plan.buildings.stream().filter(b -> b.kind() == Kind.HOUSE).count() > 2) {
+			RandomSource random = RandomSource.create(plan.seed + 77);
+			int ducks = 4 + random.nextInt(4);
+			for (int i = 0; i < ducks; i++) {
+				BlockPos at = world(field.centerX() + random.nextInt(5) - 2, ground + 1, field.centerZ() + random.nextInt(5) - 2);
+				critter(site, BlossomEntities.BEBEK, at, null, 0);
+			}
 		}
 		// a ball by the beringin for the kids
 		BlockPos ball = world(4, ground + 1, 4);
@@ -589,6 +609,20 @@ public class KampungPiece extends StructurePiece {
 
 	private BlockPos world(int x, int y, int z) {
 		return new BlockPos(cx + x, y, cz + z);
+	}
+
+	// a critter that lives in the kampung: kucing stay inside the fence
+	private void critter(KampungSite site, EntityType<? extends Critter> type, BlockPos at, BlockPos center, int radius) {
+		if (!site.chunk.isInside(at)) {
+			return;
+		}
+		Critter critter = type.create(site.level.getLevel(), EntitySpawnReason.STRUCTURE);
+		critter.snapTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5, site.level.getRandom().nextFloat() * 360, 0);
+		critter.finalizeSpawn(site.level, site.level.getCurrentDifficultyAt(at), EntitySpawnReason.STRUCTURE, null);
+		if (critter instanceof Kucing kucing) {
+			kucing.adoptHome(center, radius);
+		}
+		site.level.addFreshEntityWithPassengers(critter);
 	}
 
 	private void spawn(KampungSite site, BlockPos at, int job, int skin, BlockPos home, BlockPos bed, BlockPos work, BlockPos center, int radius) {

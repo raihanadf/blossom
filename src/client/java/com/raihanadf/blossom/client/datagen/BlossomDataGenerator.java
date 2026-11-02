@@ -422,12 +422,16 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 				builder.add(SOTO_SAPI, "Soto Sapi");
 				builder.add(MIE_GORENG, "Mie Goreng");
 				builder.add(NASI_GORENG, "Nasi Goreng");
-				critterNames(builder, "%s Spawn Egg", "Hamster", "Hedgehog", "Capybara", "Kodok");
+				critterNames(builder, "%s Spawn Egg", "Hamster", "Hedgehog", "Capybara", "Kodok", "Bebek", "Kucing", "Kukang", "Kutilang");
 				subtitles(builder, "Hamster squeaks", "Hamster hurts", "Hamster dies", "Hamster patters", "Hamster munches", "Hamster chirps happily",
 						"Hedgehog snuffles", "Hedgehog squeals", "Hedgehog dies", "Hedgehog patters", "Hedgehog curls up", "Hedgehog roots around", "Hedgehog squeaks happily",
 						"Capybara hums", "Capybara huffs", "Capybara dies", "Capybara steps", "Capybara chews", "Capybara purrs",
 						"Kodok croaks", "Kodok squeaks", "Kodok dies", "Kodok patters", "Kodok croaks happily", "Kodok flicks its tongue", "Fishing line splashes",
-						"Kodok lands a fish", "Kodok plays the biola", "Kodok shakes the angklung", "Kodok drums the kendang");
+						"Kodok lands a fish", "Kodok plays the biola", "Kodok shakes the angklung", "Kodok drums the kendang",
+						"Bebek quacks", "Bebek squawks", "Bebek dies", "Bebek waddles", "Bebek quacks happily", "Bebek splashes", "Bebek flaps",
+						"Kucing meows", "Kucing yowls", "Kucing dies", "Kucing pads", "Kucing trills", "Kucing purrs", "Kucing chirps",
+						"Kukang whistles", "Kukang squeals", "Kukang dies", "Kukang creeps", "Kukang hums", "Kukang licks",
+						"Kutilang calls", "Kutilang squeaks", "Kutilang dies", "Kutilang hops", "Kutilang chirps happily", "Kutilang sings", "Kutilang flutters");
 				playNames(builder, "Pet Treat", "Motor", "Football", "Racket", "Shuttlecock", "Goal Net", "Badminton Net",
 						"GOOOAL!", "GOOOAL! %s scores!", "Rally: %s hits", "Rally over at %s hits");
 				wargaNames(builder, "Villager", "Baton", "Villager Spawn Egg", "Here, try some %s!",
@@ -440,7 +444,8 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 						"Waiting for my train...", "I'm off to visit my family.", "The train is always a bit late, hehe.",
 						"Snacks, snacks! Fresh and tasty!", "Something for the trip?", "Come back for more later!",
 						"What a lovely kampung.", "Just got off the train!", "I'll head back to the station soon.",
-						"Rails all clear up ahead!", "Inspecting the line before the train comes.", "Keep off the track, please.");
+						"Rails all clear up ahead!", "Inspecting the line before the train comes.", "Keep off the track, please.",
+						"Kwek kwek! Come on, ducks, this way.", "My ducks know the way home better than I do.", "Fresh duck eggs this morning!");
 				builder.add(BlossomEntities.SATPAM, "Satpam");
 				builder.add(spawnEgg(BlossomEntities.SATPAM), "Satpam Spawn Egg");
 				builder.add("key.categories.blossom", "Blossom");
@@ -525,12 +530,16 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 				builder.add(SOTO_SAPI, "Soto Sapi");
 				builder.add(MIE_GORENG, "Mie Goreng");
 				builder.add(NASI_GORENG, "Nasi Goreng");
-				critterNames(builder, "Telur Spawn %s", "Hamster", "Landak", "Kapibara", "Kodok");
+				critterNames(builder, "Telur Spawn %s", "Hamster", "Landak", "Kapibara", "Kodok", "Bebek", "Kucing", "Kukang", "Kutilang");
 				subtitles(builder, "Hamster mencicit", "Hamster kesakitan", "Hamster mati", "Langkah hamster", "Hamster mengunyah", "Hamster mencicit senang",
 						"Landak mengendus", "Landak memekik", "Landak mati", "Langkah landak", "Landak menggulung", "Landak mengorek tanah", "Landak mencicit senang",
 						"Kapibara bergumam", "Kapibara mendengus", "Kapibara mati", "Langkah kapibara", "Kapibara mengunyah", "Kapibara mendengkur",
 						"Kodok berkuak", "Kodok memekik", "Kodok mati", "Langkah kodok", "Kodok berkuak senang", "Kodok menjulurkan lidah", "Kail tercebur",
-						"Kodok dapat ikan", "Kodok main biola", "Kodok menggoyang angklung", "Kodok menabuh kendang");
+						"Kodok dapat ikan", "Kodok main biola", "Kodok menggoyang angklung", "Kodok menabuh kendang",
+						"Bebek kwek-kwek", "Bebek berkoak", "Bebek mati", "Bebek berjalan", "Bebek kwek senang", "Bebek berkecipak", "Bebek mengepak sayap",
+						"Kucing mengeong", "Kucing mengerang", "Kucing mati", "Langkah kucing", "Kucing mendengkur senang", "Kucing mendengkur", "Kucing mencicit",
+						"Kukang bersiul", "Kukang memekik", "Kukang mati", "Kukang merayap", "Kukang bergumam", "Kukang menjilat",
+						"Kutilang berkicau", "Kutilang mencicit", "Kutilang mati", "Kutilang melompat", "Kutilang berkicau senang", "Kutilang bernyanyi", "Kutilang mengepak");
 				playNames(builder, "Camilan Hewan", "Motor", "Bola Sepak", "Raket", "Kok", "Jaring Gawang", "Net Bulu Tangkis",
 						"GOOOL!", "GOOOL! %s mencetak gol!", "Rally: %s pukulan", "Rally selesai di %s pukulan");
 				wargaNames(builder, "Warga", "Pentungan", "Telur Spawn Warga", "Nih, cobain %s-nya!",
@@ -543,7 +552,8 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 						"Lagi nunggu kereta...", "Mau ke rumah saudara.", "Keretanya suka telat dikit, hehe.",
 						"Jajan, jajan! Masih anget!", "Buat bekal di jalan?", "Nanti mampir lagi ya!",
 						"Kampungnya asri ya.", "Baru turun dari kereta!", "Sebentar lagi balik ke stasiun.",
-						"Rel aman, siap dilewati!", "Lagi periksa jalur sebelum kereta lewat.", "Jangan main di rel ya.");
+						"Rel aman, siap dilewati!", "Lagi periksa jalur sebelum kereta lewat.", "Jangan main di rel ya.",
+						"Kwek kwek! Ayo bebek, lewat sini.", "Bebek saya lebih hafal jalan pulang daripada saya.", "Telur bebek segar tadi pagi!");
 				builder.add(BlossomEntities.SATPAM, "Satpam");
 				builder.add(spawnEgg(BlossomEntities.SATPAM), "Telur Spawn Satpam");
 				builder.add("key.categories.blossom", "Blossom");
@@ -585,7 +595,8 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 		});
 	}
 
-	private static final List<EntityType<?>> CRITTERS = List.of(BlossomEntities.HAMSTER, BlossomEntities.HEDGEHOG, BlossomEntities.CAPYBARA, BlossomEntities.KODOK);
+	private static final List<EntityType<?>> CRITTERS = List.of(BlossomEntities.HAMSTER, BlossomEntities.HEDGEHOG, BlossomEntities.CAPYBARA, BlossomEntities.KODOK,
+			BlossomEntities.BEBEK, BlossomEntities.KUCING, BlossomEntities.KUKANG, BlossomEntities.KUTILANG);
 
 	private static Item spawnEgg(EntityType<?> critter) {
 		return BuiltInRegistries.ITEM.getValue(Blossom.id(BuiltInRegistries.ENTITY_TYPE.getKey(critter).getPath() + "_spawn_egg"));
@@ -632,7 +643,7 @@ public class BlossomDataGenerator implements DataGeneratorEntrypoint {
 		builder.add(spawnEgg(BlossomEntities.WARGA), egg);
 		builder.add("message.blossom.warga.says", "%s: %s");
 		builder.add("message.blossom.warga.cook_gift", gift);
-		List<String> jobs = List.of("resident", "farmer", "cook", "guard", "kid", "ppka", "passenger", "vendor", "traveler", "inspector");
+		List<String> jobs = List.of("resident", "farmer", "cook", "guard", "kid", "ppka", "passenger", "vendor", "traveler", "inspector", "angon");
 		for (int i = 0; i < lines.length; i++) {
 			builder.add("message.blossom.warga." + jobs.get(i / 3) + "." + i % 3, lines[i]);
 		}

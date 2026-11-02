@@ -4,7 +4,11 @@ import com.raihanadf.blossom.Blossom;
 import com.raihanadf.blossom.critters.Capybara;
 import com.raihanadf.blossom.critters.Hamster;
 import com.raihanadf.blossom.critters.Hedgehog;
+import com.raihanadf.blossom.critters.Bebek;
 import com.raihanadf.blossom.critters.Kodok;
+import com.raihanadf.blossom.critters.Kucing;
+import com.raihanadf.blossom.critters.Kukang;
+import com.raihanadf.blossom.critters.Kutilang;
 import com.raihanadf.blossom.furniture.SeatEntity;
 import com.raihanadf.blossom.kampung.Satpam;
 import com.raihanadf.blossom.kampung.Warga;
@@ -44,6 +48,14 @@ public final class BlossomEntities {
 			EntityType.Builder.of(Capybara::new, MobCategory.CREATURE).sized(0.8f, 0.75f).clientTrackingRange(10));
 	public static final EntityType<Kodok> KODOK = register("kodok",
 			EntityType.Builder.of(Kodok::new, MobCategory.CREATURE).sized(0.55f, 0.95f).clientTrackingRange(10));
+	public static final EntityType<Bebek> BEBEK = register("bebek",
+			EntityType.Builder.of(Bebek::new, MobCategory.CREATURE).sized(0.5f, 0.7f).clientTrackingRange(10));
+	public static final EntityType<Kucing> KUCING = register("kucing",
+			EntityType.Builder.of(Kucing::new, MobCategory.CREATURE).sized(0.55f, 0.6f).clientTrackingRange(10));
+	public static final EntityType<Kukang> KUKANG = register("kukang",
+			EntityType.Builder.of(Kukang::new, MobCategory.CREATURE).sized(0.45f, 0.55f).clientTrackingRange(10));
+	public static final EntityType<Kutilang> KUTILANG = register("kutilang",
+			EntityType.Builder.of(Kutilang::new, MobCategory.CREATURE).sized(0.35f, 0.35f).clientTrackingRange(10));
 
 	// kampung folk, they live in the villages and never despawn
 	public static final EntityType<Warga> WARGA = register("warga",
@@ -72,12 +84,20 @@ public final class BlossomEntities {
 		FabricDefaultAttributeRegistry.register(HEDGEHOG, Hedgehog.createAttributes());
 		FabricDefaultAttributeRegistry.register(CAPYBARA, Capybara.createAttributes());
 		FabricDefaultAttributeRegistry.register(KODOK, Kodok.createAttributes());
+		FabricDefaultAttributeRegistry.register(BEBEK, Bebek.createAttributes());
+		FabricDefaultAttributeRegistry.register(KUCING, Kucing.createAttributes());
+		FabricDefaultAttributeRegistry.register(KUKANG, Kukang.createAttributes());
+		FabricDefaultAttributeRegistry.register(KUTILANG, Kutilang.createAttributes());
 
 		SpawnPlacements.register(HAMSTER, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Animal::checkAnimalSpawnRules);
 		SpawnPlacements.register(HEDGEHOG, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Animal::checkAnimalSpawnRules);
 		// swamps and mangroves are mud, not grass, so capybaras only need solid ground
 		SpawnPlacements.register(CAPYBARA, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Mob::checkMobSpawnRules);
 		SpawnPlacements.register(KODOK, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Mob::checkMobSpawnRules);
+		SpawnPlacements.register(BEBEK, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Mob::checkMobSpawnRules);
+		SpawnPlacements.register(KUCING, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Mob::checkMobSpawnRules);
+		SpawnPlacements.register(KUKANG, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Mob::checkMobSpawnRules);
+		SpawnPlacements.register(KUTILANG, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING, Mob::checkMobSpawnRules);
 
 		BiomeModifications.addSpawn(BiomeSelectors.includeByKey(Biomes.PLAINS, Biomes.SUNFLOWER_PLAINS, Biomes.MEADOW, Biomes.CHERRY_GROVE),
 				MobCategory.CREATURE, HAMSTER, 8, 2, 3);
@@ -88,11 +108,18 @@ public final class BlossomEntities {
 		// kodok come in groups, enough for a band
 		BiomeModifications.addSpawn(BiomeSelectors.includeByKey(Biomes.SWAMP, Biomes.MANGROVE_SWAMP, Biomes.RIVER, Biomes.JUNGLE, Biomes.SPARSE_JUNGLE, Biomes.BAMBOO_JUNGLE),
 				MobCategory.CREATURE, KODOK, 8, 3, 5);
+		// bebek come in flocks by rivers, swamps and the open plains; kucing only live in kampungs (spawned by the village)
+		BiomeModifications.addSpawn(BiomeSelectors.includeByKey(Biomes.RIVER, Biomes.SWAMP, Biomes.PLAINS, Biomes.SUNFLOWER_PLAINS, Biomes.MANGROVE_SWAMP),
+				MobCategory.CREATURE, BEBEK, 8, 4, 7);
+		BiomeModifications.addSpawn(BiomeSelectors.includeByKey(Biomes.JUNGLE, Biomes.SPARSE_JUNGLE, Biomes.BAMBOO_JUNGLE),
+				MobCategory.CREATURE, KUKANG, 5, 1, 2);
+		BiomeModifications.addSpawn(BiomeSelectors.includeByKey(Biomes.PLAINS, Biomes.SUNFLOWER_PLAINS, Biomes.MEADOW, Biomes.FOREST, Biomes.FLOWER_FOREST,
+				Biomes.BIRCH_FOREST, Biomes.CHERRY_GROVE, Biomes.SAVANNA, Biomes.SPARSE_JUNGLE), MobCategory.CREATURE, KUTILANG, 7, 3, 6);
 
 		FabricDefaultAttributeRegistry.register(WARGA, Warga.createAttributes());
 		FabricDefaultAttributeRegistry.register(SATPAM, Satpam.createAttributes());
 
-		for (EntityType<?> type : new EntityType<?>[] {HAMSTER, HEDGEHOG, CAPYBARA, KODOK, WARGA, SATPAM}) {
+		for (EntityType<?> type : new EntityType<?>[] {HAMSTER, HEDGEHOG, CAPYBARA, KODOK, BEBEK, KUCING, KUKANG, KUTILANG, WARGA, SATPAM}) {
 			BlossomItems.register(BuiltInRegistries.ENTITY_TYPE.getKey(type).getPath() + "_spawn_egg", SpawnEggItem::new, new Item.Properties().spawnEgg(type));
 		}
 	}

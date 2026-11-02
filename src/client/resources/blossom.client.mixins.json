@@ -7,7 +7,8 @@
     "BatonPlayerModelMixin",
     "MinecraftAttackMixin",
     "WorldCreationMixin",
-    "LogoMixin"
+    "LogoMixin",
+    "ChatBubbleMixin"
   ],
   "injectors": {
     "defaultRequire": 1

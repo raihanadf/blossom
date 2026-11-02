@@ -85,6 +85,11 @@ public abstract class Critter extends Animal implements GeoEntity {
 		return List.of();
 	}
 
+	// a coat variant: the renderer then uses textures/entity/<name>_<coat>.png, empty for the plain texture
+	public String coat() {
+		return "";
+	}
+
 	// when it naps: at night for most critters
 	protected boolean sleepyTime() {
 		return level().isDarkOutside();

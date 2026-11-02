@@ -331,5 +331,314 @@
 				"stream": false
 			}
 		]
+	},
+	"entity.bebek.ambient": {
+		"subtitle": "subtitles.blossom.entity.bebek.ambient",
+		"sounds": [
+			{
+				"name": "blossom:entity/bebek_ambient0"
+			},
+			{
+				"name": "blossom:entity/bebek_ambient1"
+			},
+			{
+				"name": "blossom:entity/bebek_ambient2"
+			},
+			{
+				"name": "blossom:entity/bebek_ambient3"
+			}
+		]
+	},
+	"entity.bebek.hurt": {
+		"subtitle": "subtitles.blossom.entity.bebek.hurt",
+		"sounds": [
+			{
+				"name": "blossom:entity/bebek_hurt0"
+			},
+			{
+				"name": "blossom:entity/bebek_hurt1"
+			}
+		]
+	},
+	"entity.bebek.death": {
+		"subtitle": "subtitles.blossom.entity.bebek.death",
+		"sounds": [
+			{
+				"name": "blossom:entity/bebek_death"
+			}
+		]
+	},
+	"entity.bebek.step": {
+		"subtitle": "subtitles.blossom.entity.bebek.step",
+		"sounds": [
+			{
+				"name": "blossom:entity/bebek_step0"
+			},
+			{
+				"name": "blossom:entity/bebek_step1"
+			}
+		]
+	},
+	"entity.bebek.happy": {
+		"subtitle": "subtitles.blossom.entity.bebek.happy",
+		"sounds": [
+			{
+				"name": "blossom:entity/bebek_happy0"
+			},
+			{
+				"name": "blossom:entity/bebek_happy1"
+			}
+		]
+	},
+	"entity.bebek.splash": {
+		"subtitle": "subtitles.blossom.entity.bebek.splash",
+		"sounds": [
+			{
+				"name": "blossom:entity/bebek_splash0"
+			},
+			{
+				"name": "blossom:entity/bebek_splash1"
+			}
+		]
+	},
+	"entity.bebek.flap": {
+		"subtitle": "subtitles.blossom.entity.bebek.flap",
+		"sounds": [
+			{
+				"name": "blossom:entity/bebek_flap0"
+			},
+			{
+				"name": "blossom:entity/bebek_flap1"
+			}
+		]
+	},
+	"entity.kucing.ambient": {
+		"subtitle": "subtitles.blossom.entity.kucing.ambient",
+		"sounds": [
+			{
+				"name": "blossom:entity/kucing_ambient0"
+			},
+			{
+				"name": "blossom:entity/kucing_ambient1"
+			},
+			{
+				"name": "blossom:entity/kucing_ambient2"
+			},
+			{
+				"name": "blossom:entity/kucing_ambient3"
+			}
+		]
+	},
+	"entity.kucing.hurt": {
+		"subtitle": "subtitles.blossom.entity.kucing.hurt",
+		"sounds": [
+			{
+				"name": "blossom:entity/kucing_hurt0"
+			},
+			{
+				"name": "blossom:entity/kucing_hurt1"
+			}
+		]
+	},
+	"entity.kucing.death": {
+		"subtitle": "subtitles.blossom.entity.kucing.death",
+		"sounds": [
+			{
+				"name": "blossom:entity/kucing_death"
+			}
+		]
+	},
+	"entity.kucing.step": {
+		"subtitle": "subtitles.blossom.entity.kucing.step",
+		"sounds": [
+			{
+				"name": "blossom:entity/kucing_step0"
+			},
+			{
+				"name": "blossom:entity/kucing_step1"
+			}
+		]
+	},
+	"entity.kucing.happy": {
+		"subtitle": "subtitles.blossom.entity.kucing.happy",
+		"sounds": [
+			{
+				"name": "blossom:entity/kucing_happy0"
+			},
+			{
+				"name": "blossom:entity/kucing_happy1"
+			}
+		]
+	},
+	"entity.kucing.purr": {
+		"subtitle": "subtitles.blossom.entity.kucing.purr",
+		"sounds": [
+			{
+				"name": "blossom:entity/kucing_purr0"
+			},
+			{
+				"name": "blossom:entity/kucing_purr1"
+			}
+		]
+	},
+	"entity.kucing.chirp": {
+		"subtitle": "subtitles.blossom.entity.kucing.chirp",
+		"sounds": [
+			{
+				"name": "blossom:entity/kucing_chirp0"
+			},
+			{
+				"name": "blossom:entity/kucing_chirp1"
+			}
+		]
+	},
+	"entity.kukang.ambient": {
+		"subtitle": "subtitles.blossom.entity.kukang.ambient",
+		"sounds": [
+			{
+				"name": "blossom:entity/kukang_ambient0"
+			},
+			{
+				"name": "blossom:entity/kukang_ambient1"
+			},
+			{
+				"name": "blossom:entity/kukang_ambient2"
+			}
+		]
+	},
+	"entity.kukang.hurt": {
+		"subtitle": "subtitles.blossom.entity.kukang.hurt",
+		"sounds": [
+			{
+				"name": "blossom:entity/kukang_hurt0"
+			},
+			{
+				"name": "blossom:entity/kukang_hurt1"
+			}
+		]
+	},
+	"entity.kukang.death": {
+		"subtitle": "subtitles.blossom.entity.kukang.death",
+		"sounds": [
+			{
+				"name": "blossom:entity/kukang_death"
+			}
+		]
+	},
+	"entity.kukang.step": {
+		"subtitle": "subtitles.blossom.entity.kukang.step",
+		"sounds": [
+			{
+				"name": "blossom:entity/kukang_step0"
+			},
+			{
+				"name": "blossom:entity/kukang_step1"
+			}
+		]
+	},
+	"entity.kukang.happy": {
+		"subtitle": "subtitles.blossom.entity.kukang.happy",
+		"sounds": [
+			{
+				"name": "blossom:entity/kukang_happy0"
+			},
+			{
+				"name": "blossom:entity/kukang_happy1"
+			}
+		]
+	},
+	"entity.kukang.lick": {
+		"subtitle": "subtitles.blossom.entity.kukang.lick",
+		"sounds": [
+			{
+				"name": "blossom:entity/kukang_lick0"
+			},
+			{
+				"name": "blossom:entity/kukang_lick1"
+			}
+		]
+	},
+	"entity.kutilang.ambient": {
+		"subtitle": "subtitles.blossom.entity.kutilang.ambient",
+		"sounds": [
+			{
+				"name": "blossom:entity/kutilang_ambient0"
+			},
+			{
+				"name": "blossom:entity/kutilang_ambient1"
+			},
+			{
+				"name": "blossom:entity/kutilang_ambient2"
+			},
+			{
+				"name": "blossom:entity/kutilang_ambient3"
+			}
+		]
+	},
+	"entity.kutilang.hurt": {
+		"subtitle": "subtitles.blossom.entity.kutilang.hurt",
+		"sounds": [
+			{
+				"name": "blossom:entity/kutilang_hurt0"
+			},
+			{
+				"name": "blossom:entity/kutilang_hurt1"
+			}
+		]
+	},
+	"entity.kutilang.death": {
+		"subtitle": "subtitles.blossom.entity.kutilang.death",
+		"sounds": [
+			{
+				"name": "blossom:entity/kutilang_death"
+			}
+		]
+	},
+	"entity.kutilang.step": {
+		"subtitle": "subtitles.blossom.entity.kutilang.step",
+		"sounds": [
+			{
+				"name": "blossom:entity/kutilang_step0"
+			},
+			{
+				"name": "blossom:entity/kutilang_step1"
+			}
+		]
+	},
+	"entity.kutilang.happy": {
+		"subtitle": "subtitles.blossom.entity.kutilang.happy",
+		"sounds": [
+			{
+				"name": "blossom:entity/kutilang_happy0"
+			},
+			{
+				"name": "blossom:entity/kutilang_happy1"
+			}
+		]
+	},
+	"entity.kutilang.song": {
+		"subtitle": "subtitles.blossom.entity.kutilang.song",
+		"sounds": [
+			{
+				"name": "blossom:entity/kutilang_song0"
+			},
+			{
+				"name": "blossom:entity/kutilang_song1"
+			},
+			{
+				"name": "blossom:entity/kutilang_song2"
+			}
+		]
+	},
+	"entity.kutilang.flap": {
+		"subtitle": "subtitles.blossom.entity.kutilang.flap",
+		"sounds": [
+			{
+				"name": "blossom:entity/kutilang_flap0"
+			},
+			{
+				"name": "blossom:entity/kutilang_flap1"
+			}
+		]
 	}
 }

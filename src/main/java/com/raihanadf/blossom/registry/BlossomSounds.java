@@ -47,6 +47,37 @@ public final class BlossomSounds {
 	public static final SoundEvent KODOK_ANGKLUNG = register("music.kodok.angklung");
 	public static final SoundEvent KODOK_KENDANG = register("music.kodok.kendang");
 
+	public static final SoundEvent BEBEK_AMBIENT = register("entity.bebek.ambient");
+	public static final SoundEvent BEBEK_HURT = register("entity.bebek.hurt");
+	public static final SoundEvent BEBEK_DEATH = register("entity.bebek.death");
+	public static final SoundEvent BEBEK_STEP = register("entity.bebek.step");
+	public static final SoundEvent BEBEK_HAPPY = register("entity.bebek.happy");
+	public static final SoundEvent BEBEK_SPLASH = register("entity.bebek.splash");
+	public static final SoundEvent BEBEK_FLAP = register("entity.bebek.flap");
+
+	public static final SoundEvent KUCING_AMBIENT = register("entity.kucing.ambient");
+	public static final SoundEvent KUCING_HURT = register("entity.kucing.hurt");
+	public static final SoundEvent KUCING_DEATH = register("entity.kucing.death");
+	public static final SoundEvent KUCING_STEP = register("entity.kucing.step");
+	public static final SoundEvent KUCING_HAPPY = register("entity.kucing.happy");
+	public static final SoundEvent KUCING_PURR = register("entity.kucing.purr");
+	public static final SoundEvent KUCING_CHIRP = register("entity.kucing.chirp");
+
+	public static final SoundEvent KUKANG_AMBIENT = register("entity.kukang.ambient");
+	public static final SoundEvent KUKANG_HURT = register("entity.kukang.hurt");
+	public static final SoundEvent KUKANG_DEATH = register("entity.kukang.death");
+	public static final SoundEvent KUKANG_STEP = register("entity.kukang.step");
+	public static final SoundEvent KUKANG_HAPPY = register("entity.kukang.happy");
+	public static final SoundEvent KUKANG_LICK = register("entity.kukang.lick");
+
+	public static final SoundEvent KUTILANG_AMBIENT = register("entity.kutilang.ambient");
+	public static final SoundEvent KUTILANG_HURT = register("entity.kutilang.hurt");
+	public static final SoundEvent KUTILANG_DEATH = register("entity.kutilang.death");
+	public static final SoundEvent KUTILANG_STEP = register("entity.kutilang.step");
+	public static final SoundEvent KUTILANG_HAPPY = register("entity.kutilang.happy");
+	public static final SoundEvent KUTILANG_SONG = register("entity.kutilang.song");
+	public static final SoundEvent KUTILANG_FLAP = register("entity.kutilang.flap");
+
 	private BlossomSounds() {
 	}
 

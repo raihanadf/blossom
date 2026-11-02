@@ -4,6 +4,7 @@ import com.geckolib.constant.dataticket.DataTicket;
 import com.geckolib.model.DefaultedEntityGeoModel;
 import com.geckolib.renderer.GeoEntityRenderer;
 import com.geckolib.renderer.base.BoneSnapshots;
+import com.geckolib.renderer.base.GeoRenderState;
 import com.geckolib.renderer.base.RenderPassInfo;
 import java.util.List;
 import com.raihanadf.blossom.Blossom;
@@ -24,6 +25,7 @@ import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.minecraft.client.Minecraft;
@@ -42,6 +44,10 @@ public class BlossomClient implements ClientModInitializer {
 		critter(BlossomEntities.HEDGEHOG, 0.3f);
 		critter(BlossomEntities.CAPYBARA, 0.5f);
 		critter(BlossomEntities.KODOK, 0.35f);
+		critter(BlossomEntities.BEBEK, 0.3f);
+		critter(BlossomEntities.KUCING, 0.3f);
+		critter(BlossomEntities.KUKANG, 0.25f);
+		critter(BlossomEntities.KUTILANG, 0.15f);
 		EntityRenderers.register(BlossomEntities.WARGA, WargaRenderer::new);
 		EntityRenderers.register(BlossomEntities.SATPAM, WargaRenderer::new);
 		EntityRenderers.register(BlossomEntities.TRAIN_CAR, TrainRenderer::new);
@@ -51,6 +57,7 @@ public class BlossomClient implements ClientModInitializer {
 		EntityRenderers.register(BlossomEntities.SHUTTLECOCK, RideRenderers.shuttlecock());
 		BatonMotion.init();
 		PlaceHud.init();
+		ChatBubbles.init();
 		// every motor that shows up on this client gets its own engine sound
 		ClientEntityEvents.ENTITY_LOAD.register((entity, level) -> {
 			if (entity instanceof Motor motor) {
@@ -62,12 +69,21 @@ public class BlossomClient implements ClientModInitializer {
 	}
 
 	// geckolib model, texture and animations are all found by the entity's name under assets/blossom;
-	// props the critter isn't using right now (Critter.hiddenBones) are left out
+	// props the critter isn't using right now (Critter.hiddenBones) are left out, and coat variants
+	// (Critter.coat) pick textures/entity/<name>_<coat>.png
 	@SuppressWarnings("unchecked")
 	private static final DataTicket<List<String>> HIDDEN = DataTicket.create("blossom_hidden_bones", (Class<List<String>>) (Class<?>) List.class);
+	private static final DataTicket<String> COAT = DataTicket.create("blossom_coat", String.class);
 
 	private static <T extends Critter> void critter(EntityType<T> type, float shadow) {
-		DefaultedEntityGeoModel<T> model = new DefaultedEntityGeoModel<>(Blossom.id(BuiltInRegistries.ENTITY_TYPE.getKey(type).getPath()));
+		String name = BuiltInRegistries.ENTITY_TYPE.getKey(type).getPath();
+		DefaultedEntityGeoModel<T> model = new DefaultedEntityGeoModel<>(Blossom.id(name)) {
+			@Override
+			public Identifier getTextureResource(GeoRenderState state) {
+				String coat = state.getOrDefaultGeckolibData(COAT, "");
+				return coat.isEmpty() ? super.getTextureResource(state) : buildFormattedTexturePath(Blossom.id(name + "_" + coat));
+			}
+		};
 		EntityRendererProvider<T> provider = context -> new GeoEntityRenderer<T, LivingEntityRenderState>(context, model) {
 			{
 				shadowRadius = shadow;
@@ -77,6 +93,7 @@ public class BlossomClient implements ClientModInitializer {
 			@Override
 			public void addRenderData(T critter, Void related, LivingEntityRenderState state, float partialTick) {
 				state.addGeckolibData(HIDDEN, critter.hiddenBones());
+				state.addGeckolibData(COAT, critter.coat());
 			}
 
 			@Override
