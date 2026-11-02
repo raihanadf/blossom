@@ -104,8 +104,11 @@ public final class TrackBuilder {
 	// against water), whatever stands in the way of the trains is cleared, and missing rails are laid again. returns
 	// how many blocks it changed
 	public static int repair(Site site, Edge edge, int from, int to) {
-		int first = Math.max(0, from - 3);
-		int last = Math.min(edge.length() - 1, to + 3);
+		// every column is planned from its true nearest sample, as when the line was generated: looking only a few
+		// samples past the stretch, a column at its end on a curve or a climb took a neighbour's height, the crew
+		// rebuilt a parapet a block off, and the next inspection put it back (the trolley stopped there every run)
+		int first = Math.max(0, from - 24);
+		int last = Math.min(edge.length() - 1, to + 24);
 		int changed = 0;
 		Set<Long> done = new HashSet<>();
 		// the bed is rebuilt over the same stretch the rails are laid again on, so no track is ever laid where the deck

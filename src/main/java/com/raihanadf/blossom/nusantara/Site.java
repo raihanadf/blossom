@@ -60,13 +60,15 @@ public class Site {
 		return planned != null;
 	}
 
-	// after a dry run: where the builder would put a different block than the one standing there. grass and flowers
-	// that grew back don't count
+	// after a dry run: where the builder would put a different block than the one standing there. plants that grew
+	// (grass, flowers, ferns, saplings, leaf litter: nothing a train could hit) don't count; the crew used to pull up
+	// for every dandelion beside the rails, since a repair clears a little wider than the line was first built
 	public List<BlockPos> changes() {
 		List<BlockPos> out = new ArrayList<>();
 		for (Map.Entry<BlockPos, BlockState> entry : planned.entrySet()) {
 			BlockState there = level.getBlockState(entry.getKey());
-			boolean growth = !there.isAir() && there.canBeReplaced() && there.getFluidState().isEmpty();
+			boolean growth = !there.isAir() && there.getFluidState().isEmpty()
+					&& (there.canBeReplaced() || entry.getValue().isAir() && there.getCollisionShape(level, entry.getKey()).isEmpty());
 			if (!there.is(entry.getValue().getBlock()) && !growth) {
 				out.add(entry.getKey());
 			}

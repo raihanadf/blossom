@@ -312,6 +312,11 @@ public class Lori extends Entity implements GeoEntity {
 		survey = Site.survey(level, area);
 		TrackBuilder.repair(survey, edge, lo, hi);
 		wrong = survey.changes();
+		// looked at again over the wider stretch it can all turn out fine after all (nothing to stop for)
+		if (wrong.isEmpty()) {
+			checked = target;
+			return false;
+		}
 		// nearest first, close spots worked together
 		Vec3 heading = Vec3.directionFromRotation(0, getYRot()).scale(run.direction());
 		wrong.sort((p, q) -> Double.compare(Vec3.atCenterOf(p).subtract(position()).dot(heading), Vec3.atCenterOf(q).subtract(position()).dot(heading)));
